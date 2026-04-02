@@ -1,0 +1,391 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearchPostgres"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  GERENCIA
+  ADMINISTRADOR
+  CONTADOR
+  VENTAS
+}
+
+enum TipoPersona {
+  JURIDICA
+  NATURAL
+  IMMUNOTEC
+  FOUR_LIFE
+  RXH
+}
+
+enum Regimen {
+  MYPE
+  RER
+  REG
+}
+
+enum EstadoPersona {
+  ACTIVO
+  INACTIVO
+  ARCHIVADO
+}
+
+enum TipoContabilidad {
+  MANUAL
+  COMPUTARIZADA
+}
+
+enum EstadoLead {
+  NUEVO
+  CONTACTADO
+  COTIZADO
+  CONVERTIDO
+  PERDIDO
+}
+
+enum CategoriaServicio {
+  MENSUAL
+  ANUAL
+  TRAMITE
+  ASESORIA
+  CONSTITUCION
+  REGULARIZACION
+  MODIF_ESTATUTO
+  OTROS
+}
+
+enum EstadoServicio {
+  ACTIVO
+  COMPLETADO
+  ARCHIVADO
+}
+
+enum EstadoCobranza {
+  PENDIENTE
+  PARCIAL
+  COBRADO
+  INCOBRABLE
+}
+
+enum Prioridad {
+  ALTA
+  MEDIA
+  BAJA
+}
+
+enum EstadoIncidencia {
+  ABIERTA
+  EN_PROGRESO
+  RESUELTA
+  CERRADA
+}
+
+enum TipoFinanza {
+  INGRESO
+  EGRESO
+}
+
+enum TipoCuenta {
+  CORRIENTE
+  AHORROS
+  EFECTIVO
+  DIGITAL
+}
+
+enum TipoCajaChica {
+  INGRESO
+  GASTO
+}
+
+model User {
+  id           String   @id @default(cuid())
+  nombre       String
+  apellido     String
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  role         Role     @default(CONTADOR)
+  telefono     String?
+  activo       Boolean  @default(true)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  servicios         Servicio[]   @relation("ContadorServicio")
+  leadsAsignados    Lead[]       @relation("LeadAsignado")
+  actividades       Actividad[]
+  incidencias       Incidencia[] @relation("ContadorIncidencia")
+  finanzasCreadas   Finanza[]    @relation("FinanzaCreador")
+  cajaChicaCreadas  CajaChica[]  @relation("CajaChicaCreador")
+  personasAsignadas Persona[]    @relation("ContadorPersona")
+  auditLogs         AuditLog[]
+
+  @@map("users")
+}
+
+model Lead {
+  id              String     @id @default(cuid())
+  nombre          String
+  apellido        String
+  dni             String?    @db.VarChar(8)
+  celular         String
+  email           String?
+  regimen         Regimen?
+  rubro           String?
+  numTrabajadores Int?       @map("num_trabajadores")
+  estado          EstadoLead @default(NUEVO)
+  notas           String?    @db.Text
+  asignadoAId     String?    @map("asignado_a_id")
+  asignadoA       User?      @relation("LeadAsignado", fields: [asignadoAId], references: [id])
+  convertidoAId   String?    @unique @map("convertido_a_id")
+  convertidoA     Persona?   @relation("LeadConvertido", fields: [convertidoAId], references: [id])
+  createdAt       DateTime   @default(now()) @map("created_at")
+  updatedAt       DateTime   @updatedAt @map("updated_at")
+
+  @@index([estado])
+  @@index([asignadoAId])
+  @@map("leads")
+}
+
+model Persona {
+  id                    String           @id @default(cuid())
+  razonSocial           String           @map("razon_social")
+  ruc                   String           @unique @db.VarChar(11)
+  tipoPersona           TipoPersona      @map("tipo_persona")
+  regimen               Regimen
+  direccion             String?
+  telefono              String?
+  email                 String?
+  representanteNombre   String?          @map("representante_nombre")
+  representanteDni      String?          @map("representante_dni") @db.VarChar(8)
+  representanteTelefono String?          @map("representante_telefono")
+  claveSolUsuario       String?          @map("clave_sol_usuario")
+  claveSolClave         String?          @map("clave_sol_clave")
+  afpUsuario            String?          @map("afp_usuario")
+  afpClave              String?          @map("afp_clave")
+  detracciones          Boolean          @default(false)
+  tipoContabilidad      TipoContabilidad @default(MANUAL) @map("tipo_contabilidad")
+  partidaElectronica    String?          @map("partida_electronica")
+  planilla              Boolean          @default(false)
+  numTrabajadores       Int?             @map("num_trabajadores")
+  estado                EstadoPersona    @default(ACTIVO)
+  contadorAsignadoId    String           @map("contador_asignado_id")
+  contadorAsignado      User             @relation("ContadorPersona", fields: [contadorAsignadoId], references: [id])
+  createdAt             DateTime         @default(now()) @map("created_at")
+  updatedAt             DateTime         @updatedAt @map("updated_at")
+
+  servicios   Servicio[]
+  incidencias Incidencia[]
+  libros      Libro[]
+  leadOrigen  Lead?        @relation("LeadConvertido")
+
+  @@index([contadorAsignadoId])
+  @@index([estado])
+  @@index([ruc])
+  @@index([tipoPersona])
+  @@map("personas")
+}
+
+model TipoServicio {
+  id              String            @id @default(cuid())
+  nombre          String            @unique
+  categoria       CategoriaServicio
+  requierePeriodo Boolean           @default(false) @map("requiere_periodo")
+  activo          Boolean           @default(true)
+  orden           Int               @default(0)
+  servicios       Servicio[]
+
+  @@map("tipos_servicio")
+}
+
+model Servicio {
+  id             String         @id @default(cuid())
+  personaId      String         @map("persona_id")
+  persona        Persona        @relation(fields: [personaId], references: [id])
+  tipoServicioId String         @map("tipo_servicio_id")
+  tipoServicio   TipoServicio   @relation(fields: [tipoServicioId], references: [id])
+  contadorId     String         @map("contador_id")
+  contador       User           @relation("ContadorServicio", fields: [contadorId], references: [id])
+  periodo        String?        @db.VarChar(7)
+  baseImponible  Int            @default(0) @map("base_imponible")
+  igv            Int            @default(0)
+  noGravado      Int            @default(0) @map("no_gravado")
+  totalImponible Int            @default(0) @map("total_imponible")
+  honorarios     Int            @default(0)
+  descuento      Int            @default(0)
+  precioFinal    Int            @default(0) @map("precio_final")
+  montoCobrado   Int            @default(0) @map("monto_cobrado")
+  montoRestante  Int            @default(0) @map("monto_restante")
+  estadoCobranza EstadoCobranza @default(PENDIENTE) @map("estado_cobranza")
+  estado         EstadoServicio @default(ACTIVO)
+  notas          String?        @db.Text
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+
+  declaracionAnualDetalles DeclaracionAnualDetalle[]
+  actividades              Actividad[]
+  finanzas                 Finanza[]
+
+  @@index([personaId, periodo])
+  @@index([contadorId, estado])
+  @@index([tipoServicioId, periodo])
+  @@index([estadoCobranza])
+  @@map("servicios")
+}
+
+model DeclaracionAnualDetalle {
+  id         String   @id @default(cuid())
+  servicioId String   @map("servicio_id")
+  servicio   Servicio @relation(fields: [servicioId], references: [id], onDelete: Cascade)
+  mes        Int
+  completado Boolean  @default(false)
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@unique([servicioId, mes])
+  @@map("declaracion_anual_detalles")
+}
+
+model Actividad {
+  id              String    @id @default(cuid())
+  servicioId      String    @map("servicio_id")
+  servicio        Servicio  @relation(fields: [servicioId], references: [id], onDelete: Cascade)
+  equipoId        String    @map("equipo_id")
+  equipo          User      @relation(fields: [equipoId], references: [id])
+  horaInicio      DateTime  @map("hora_inicio")
+  horaFin         DateTime? @map("hora_fin")
+  duracionMinutos Int?      @map("duracion_minutos")
+  descripcion     String?   @db.Text
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@index([servicioId])
+  @@index([equipoId])
+  @@map("actividades")
+}
+
+model Incidencia {
+  id                String           @id @default(cuid())
+  personaId         String           @map("persona_id")
+  persona           Persona          @relation(fields: [personaId], references: [id])
+  contadorId        String           @map("contador_id")
+  contador          User             @relation("ContadorIncidencia", fields: [contadorId], references: [id])
+  prioridad         Prioridad        @default(MEDIA)
+  titulo            String
+  descripcion       String           @db.Text
+  detalleFinanciero String?          @map("detalle_financiero") @db.Text
+  estado            EstadoIncidencia @default(ABIERTA)
+  fechaLimite       DateTime?        @map("fecha_limite")
+  periodo           String?          @db.VarChar(7)
+  createdAt         DateTime         @default(now()) @map("created_at")
+  updatedAt         DateTime         @updatedAt @map("updated_at")
+  adjuntos          Attachment[]
+
+  @@index([personaId, estado])
+  @@index([contadorId])
+  @@map("incidencias")
+}
+
+model Attachment {
+  id           String      @id @default(cuid())
+  incidenciaId String?     @map("incidencia_id")
+  incidencia   Incidencia? @relation(fields: [incidenciaId], references: [id], onDelete: Cascade)
+  fileName     String      @map("file_name")
+  fileType     String      @map("file_type")
+  fileSize     Int         @map("file_size")
+  storagePath  String      @map("storage_path")
+  url          String
+  createdAt    DateTime    @default(now()) @map("created_at")
+
+  @@index([incidenciaId])
+  @@map("attachments")
+}
+
+model Libro {
+  id            String   @id @default(cuid())
+  personaId     String   @map("persona_id")
+  persona       Persona  @relation(fields: [personaId], references: [id])
+  tipoLibro     String   @map("tipo_libro")
+  anio          Int
+  mes           Int
+  completado    Boolean  @default(false)
+  constanciaUrl String?  @map("constancia_url")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@unique([personaId, tipoLibro, anio, mes])
+  @@index([personaId, anio])
+  @@map("libros")
+}
+
+model CuentaBancaria {
+  id       String     @id @default(cuid())
+  nombre   String     @unique
+  banco    String
+  tipo     TipoCuenta
+  activo   Boolean    @default(true)
+  orden    Int        @default(0)
+  finanzas Finanza[]
+
+  @@map("cuentas_bancarias")
+}
+
+model Finanza {
+  id              String         @id @default(cuid())
+  tipo            TipoFinanza
+  monto           Int
+  fecha           DateTime
+  concepto        String
+  numeroOperacion String?        @map("numero_operacion")
+  cuentaId        String         @map("cuenta_id")
+  cuenta          CuentaBancaria @relation(fields: [cuentaId], references: [id])
+  servicioId      String?        @map("servicio_id")
+  servicio        Servicio?      @relation(fields: [servicioId], references: [id])
+  categoriaGasto  String?        @map("categoria_gasto")
+  comprobanteUrl  String?        @map("comprobante_url")
+  notas           String?        @db.Text
+  creadoPorId     String         @map("creado_por_id")
+  creadoPor       User           @relation("FinanzaCreador", fields: [creadoPorId], references: [id])
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+
+  @@index([fecha])
+  @@index([tipo, fecha])
+  @@index([cuentaId, fecha])
+  @@index([servicioId])
+  @@map("finanzas")
+}
+
+model CajaChica {
+  id             String        @id @default(cuid())
+  tipo           TipoCajaChica
+  monto          Int
+  fecha          DateTime
+  concepto       String
+  comprobanteUrl String?       @map("comprobante_url")
+  saldoAcumulado Int           @map("saldo_acumulado")
+  creadoPorId    String        @map("creado_por_id")
+  creadoPor      User          @relation("CajaChicaCreador", fields: [creadoPorId], references: [id])
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  @@index([fecha])
+  @@map("caja_chica")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id])
+  accion    String
+  entidad   String
+  entidadId String   @map("entidad_id")
+  metadata  Json?
+  ip        String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId, createdAt])
+  @@index([entidad, entidadId])
+  @@map("audit_logs")
+}
