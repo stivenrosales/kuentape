@@ -77,7 +77,8 @@ export function FinanzaTableSimple({
   total = 0,
   page = 1,
   pageSize = 25,
-}: FinanzaTableSimpleProps) {
+  isAdmin = false,
+}: FinanzaTableSimpleProps & { isAdmin?: boolean }) {
   const router = useRouter();
   const totalPages = Math.ceil(total / pageSize);
 
@@ -276,6 +277,7 @@ export function FinanzaTableSimple({
       {selected && (
         <FinanzaDetailDialog
           finanza={selected}
+          isAdmin={isAdmin}
           onClose={() => setSelected(null)}
         />
       )}
