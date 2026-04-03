@@ -1,36 +1,178 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
 
-## Getting Started
+# 📊 Sheila — Estudio Contable
 
-First, run the development server:
+**Sistema de gestión integral para estudios contables**
+
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Prisma](https://img.shields.io/badge/Prisma-7-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
+
+*Reemplazo completo de Airtable + n8n para la gestión de un estudio contable peruano — clientes, servicios, cobranzas, reportes PDF, y más.*
+
+---
+
+</div>
+
+## 🧠 ¿Qué es Sheila?
+
+Sheila es una aplicación web completa para gestionar las operaciones diarias de un estudio contable. Diseñada para reemplazar un sistema basado en Airtable + n8n, ofrece:
+
+- 🏢 **Gestión de clientes** con edición inline y credenciales encriptadas
+- 📋 **Servicios contables** con pricing automático y tracking de cobranza
+- 💰 **Finanzas** con control de ingresos, egresos y caja chica
+- 🎯 **Pipeline de prospectos** con Kanban drag-and-drop
+- 📊 **Dashboards** diferenciados por rol (Gerencia / Contador / Ventas)
+- 📄 **Generación de PDFs** nativos (reportes mensuales, caja chica, cotizaciones)
+- 📚 **Control de libros contables** con generación automática mensual
+- 🔐 **Autenticación y RBAC** con 4 roles
+
+## ✨ Features
+
+### 👨‍💼 Para Contadores
+- 📝 Lista de servicios del mes con checkbox de declaración
+- 💳 Registro de cobros con comprobante (subido a Cloudflare R2)
+- 📊 Vista de cobranzas personales
+- 🔔 Incidencias por cliente
+
+### 👩‍💻 Para Gerencia / Admin
+- 📈 Dashboard ejecutivo con rendimiento por contador
+- 💰 Control financiero completo (ingresos, egresos, utilidad)
+- 👥 Gestión de equipo
+- 📄 Generación de reportes PDF
+- ⚙️ Configuración de tipos de servicio y cuentas bancarias
+
+### 🤝 Para Ventas
+- 🎯 Pipeline Kanban de prospectos con drag-and-drop
+- 📋 Cotizaciones automáticas
+- 🔄 Conversión de prospecto a cliente
+
+## 🛠️ Tech Stack
+
+| Capa | Tecnología |
+|------|-----------|
+| **Frontend** | Next.js 15 (App Router), React 19, TypeScript |
+| **UI** | shadcn/ui (base-ui), Tailwind CSS v4, Claymorphism theme |
+| **Base de datos** | PostgreSQL 16 + Prisma 7 |
+| **Autenticación** | Auth.js v5 (JWT, Credentials) |
+| **Storage** | Cloudflare R2 (comprobantes, adjuntos) |
+| **Charts** | Recharts |
+| **PDF** | @react-pdf/renderer |
+| **Drag & Drop** | @atlaskit/pragmatic-drag-and-drop |
+| **Package Manager** | pnpm |
+
+## 🚀 Quick Start
+
+### Requisitos
+- Node.js 20+
+- PostgreSQL 16
+- pnpm
+
+### Instalación
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+# Clonar el repo
+git clone git@github.com:stivenrosales/Estudio-Contable-Haiku.git
+cd Estudio-Contable-Haiku
+
+# Instalar dependencias
+pnpm install
+
+# Configurar variables de entorno
+cp .env.example .env.local
+# Editar .env.local con tu DATABASE_URL, AUTH_SECRET, etc.
+
+# Crear la base de datos y migrar
+pnpm prisma migrate dev --name init
+pnpm prisma generate
+
+# Seed con datos de demostración
+pnpm prisma db seed
+
+# Iniciar en desarrollo
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 🔑 Usuarios de prueba
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Email | Password | Rol |
+|-------|----------|-----|
+| `admin@sheila.pe` | `admin123` | 👑 Gerencia |
+| `gabriela@sheila.pe` | `contador123` | 📋 Contador |
+| `leo@sheila.pe` | `contador123` | 📋 Contador |
+| `ventas@sheila.pe` | `ventas123` | 🤝 Ventas |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📁 Estructura del Proyecto
 
-## Learn More
+```
+src/
+├── app/                    # Next.js App Router
+│   ├── (app)/             # Rutas protegidas
+│   ├── (auth)/            # Login
+│   └── api/               # API routes
+├── components/            # Componentes compartidos
+├── features/              # Módulos de negocio
+│   ├── servicios/         # Servicios contables
+│   ├── personas/          # Clientes
+│   ├── leads/             # Prospectos / pipeline
+│   ├── finanzas/          # Finanzas y transacciones
+│   ├── caja-chica/        # Caja chica
+│   ├── incidencias/       # Tickets
+│   ├── libros/            # Libros contables
+│   ├── staff/             # Equipo
+│   ├── reportes/          # PDFs
+│   ├── cobranzas/         # Cobranzas
+│   └── dashboard/         # Dashboard por rol
+├── lib/                   # Utilidades
+└── types/                 # TypeScript types
+```
 
-To learn more about Next.js, take a look at the following resources:
+## 🔒 Seguridad
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- 🔐 **Credenciales encriptadas** — AES-256-GCM con rotación de keys
+- 🛡️ **RBAC en 3 capas** — Middleware → Server Component → Server Action
+- 👁️ **Scoping por rol** — Contadores solo ven sus propios clientes
+- 📝 **Audit log** — Acciones sensibles registradas automáticamente
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 💲 Pricing Automático
 
-## Deploy on Vercel
+El sistema calcula honorarios basado en reglas de negocio:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Servicio | Cálculo |
+|----------|---------|
+| **Declaración mensual** | Tipo persona + régimen + facturación |
+| **Constitución** | Monto de capital social |
+| **Planilla** | Cantidad de trabajadores |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Los precios se congelan al crear — cambios futuros no afectan servicios existentes.
+
+## 📅 Automatización
+
+| Job | Schedule | Descripción |
+|-----|----------|-------------|
+| 📚 Generar Libros | 1ro de cada mes | Crea libros contables para todas las empresas activas |
+
+## 🤝 Contribuir
+
+1. Fork el repo
+2. Creá tu branch (`git checkout -b feature/nueva-feature`)
+3. Commit tus cambios (`git commit -m 'feat: nueva feature'`)
+4. Push (`git push origin feature/nueva-feature`)
+5. Abrí un Pull Request
+
+## 📜 Licencia
+
+Este proyecto está bajo la licencia **MIT**. Ver [LICENSE](LICENSE) para más detalles.
+
+---
+
+<div align="center">
+
+**Desarrollado con ❤️ para estudios contables peruanos**
+
+[![GitHub](https://img.shields.io/badge/GitHub-stivenrosales-181717?style=for-the-badge&logo=github)](https://github.com/stivenrosales)
+
+</div>

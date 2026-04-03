@@ -71,6 +71,14 @@ enum EstadoCobranza {
   INCOBRABLE
 }
 
+enum EstadoTrabajo {
+  POR_DECLARAR
+  DECLARADO
+  POR_COBRAR
+  COBRADO
+  ARCHIVADO
+}
+
 enum Prioridad {
   ALTA
   MEDIA
@@ -219,6 +227,7 @@ model Servicio {
   montoCobrado   Int            @default(0) @map("monto_cobrado")
   montoRestante  Int            @default(0) @map("monto_restante")
   estadoCobranza EstadoCobranza @default(PENDIENTE) @map("estado_cobranza")
+  estadoTrabajo  EstadoTrabajo  @default(POR_DECLARAR) @map("estado_trabajo")
   estado         EstadoServicio @default(ACTIVO)
   notas          String?        @db.Text
   createdAt      DateTime       @default(now()) @map("created_at")

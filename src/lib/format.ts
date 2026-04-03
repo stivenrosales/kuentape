@@ -25,3 +25,13 @@ export function formatRUC(ruc: string): string {
 export function formatPercent(value: number): string {
   return `${(value * 100).toFixed(1)}%`;
 }
+
+/**
+ * Returns the previous month as "YYYY-MM".
+ * If today is April 2026, returns "2026-03".
+ */
+export function getPeriodoAnterior(): string {
+  const now = new Date();
+  const prev = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, "0")}`;
+}

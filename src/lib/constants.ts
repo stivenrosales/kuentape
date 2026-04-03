@@ -146,6 +146,28 @@ export const TIPO_CAJA_CHICA_LABELS: Record<string, string> = {
 // IGV rate (18%)
 export const IGV_RATE = 0.18;
 
+// Estado de trabajo (flujo Kanban)
+export const ESTADO_TRABAJO_LABELS: Record<string, string> = {
+  POR_DECLARAR: "Por Declarar",
+  DECLARADO: "Declarado",
+  POR_COBRAR: "Por Cobrar",
+  COBRADO: "Cobrado",
+  ARCHIVADO: "Archivado",
+};
+
+export const ESTADO_TRABAJO_COLORS: Record<string, string> = {
+  POR_DECLARAR:
+    "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+  DECLARADO:
+    "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200",
+  POR_COBRAR:
+    "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
+  COBRADO:
+    "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+  ARCHIVADO:
+    "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200",
+};
+
 // Timezone
 export const APP_TIMEZONE = "America/Lima";
 
