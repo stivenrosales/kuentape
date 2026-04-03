@@ -16,6 +16,7 @@ export interface FinanzaRow {
   concepto: string;
   monto: number;
   fecha: Date;
+  numeroOperacion: string | null;
   categoriaGasto: string | null;
   comprobanteUrl: string | null;
   cuenta: { id: string; nombre: string; banco: string };

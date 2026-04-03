@@ -21,7 +21,7 @@ import { LineChart } from "@/components/charts/line-chart";
 import { BarChart } from "@/components/charts/bar-chart";
 import { formatCurrency } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { FinanzaTable } from "./finanza-table";
+import { FinanzaTableSimple } from "./finanza-table-simple";
 import { FinanzaForm } from "./finanza-form";
 import type { FinanzaRow } from "./finanza-table";
 
@@ -666,10 +666,9 @@ export function FinanzasOverview({
               </Button>
             )}
           </div>
-          <FinanzaTable
+          <FinanzaTableSimple
             data={todasTransacciones ?? []}
-            canEdit={canEdit}
-            onEdit={handleEdit}
+            total={todasTransacciones?.length ?? 0}
           />
         </div>
       )}
