@@ -19,6 +19,7 @@ export interface FinanzaRow {
   numeroOperacion: string | null;
   categoriaGasto: string | null;
   comprobanteUrl: string | null;
+  validado: boolean;
   cuenta: { id: string; nombre: string; banco: string };
   servicio?: { persona: { razonSocial: string }; tipoServicio: { nombre: string } } | null;
 }

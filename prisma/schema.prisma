@@ -354,6 +354,9 @@ model Finanza {
   categoriaGasto  String?        @map("categoria_gasto")
   comprobanteUrl  String?        @map("comprobante_url")
   notas           String?        @db.Text
+  validado        Boolean        @default(false)
+  validadoPorId   String?        @map("validado_por_id")
+  validadoAt      DateTime?      @map("validado_at")
   creadoPorId     String         @map("creado_por_id")
   creadoPor       User           @relation("FinanzaCreador", fields: [creadoPorId], references: [id])
   createdAt       DateTime       @default(now()) @map("created_at")

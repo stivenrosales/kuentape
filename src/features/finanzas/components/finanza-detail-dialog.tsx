@@ -48,7 +48,8 @@ export function FinanzaDetailDialog({ finanza, isAdmin = false, onClose }: Finan
   const config = TIPO_CONFIG[finanza.tipo];
   const { Icon } = config;
   const [imageExpanded, setImageExpanded] = React.useState(false);
-  const [validated, setValidated] = React.useState(false);
+  const [validated, setValidated] = React.useState(finanza.validado ?? false);
+  const [validating, setValidating] = React.useState(false);
 
   React.useEffect(() => {
     function handleEsc(e: KeyboardEvent) { if (e.key === "Escape") { if (imageExpanded) setImageExpanded(false); else onClose(); } }
@@ -56,10 +57,21 @@ export function FinanzaDetailDialog({ finanza, isAdmin = false, onClose }: Finan
     return () => document.removeEventListener("keydown", handleEsc);
   }, [onClose, imageExpanded]);
 
-  function handleValidate() {
-    setValidated(!validated);
-    toast.success(validated ? "Validación removida" : "Pago validado");
-    // TODO: persist to DB when validado field exists
+  async function handleValidate() {
+    setValidating(true);
+    try {
+      const res = await fetch(`/api/finanzas/${finanza.id}/validar`, { method: "POST" });
+      if (res.ok) {
+        const data = await res.json();
+        setValidated(data.validado);
+        toast.success(data.validado ? "Pago validado" : "Validación removida");
+      } else {
+        toast.error("Error al validar");
+      }
+    } catch {
+      toast.error("Error al validar");
+    }
+    setValidating(false);
   }
 
   return (
@@ -138,15 +150,16 @@ export function FinanzaDetailDialog({ finanza, isAdmin = false, onClose }: Finan
             {isAdmin && finanza.tipo === "INGRESO" && (
               <button
                 onClick={handleValidate}
+                disabled={validating}
                 className={cn(
-                  "w-full flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors",
+                  "w-full flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-50",
                   validated
                     ? "border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-300"
                     : "border-border bg-muted/20 text-muted-foreground hover:bg-muted/40 hover:text-foreground"
                 )}
               >
                 <CheckCircle className={cn("h-4 w-4", validated ? "text-emerald-600" : "text-muted-foreground/50")} />
-                {validated ? "Pago validado" : "Validar pago"}
+                {validating ? "..." : validated ? "Pago validado ✓" : "Validar pago"}
               </button>
             )}
           </div>
