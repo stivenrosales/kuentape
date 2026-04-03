@@ -11,7 +11,7 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
 
-*Reemplazo completo de Airtable + n8n para la gestión de un estudio contable peruano — clientes, servicios, cobranzas, reportes PDF, y más.*
+*Sistema integral para estudios contables peruanos — clientes, servicios, cobranzas, reportes PDF, y más.*
 
 ---
 
@@ -19,7 +19,7 @@
 
 ## 🧠 ¿Qué es Kuenta?
 
-Kuenta es una aplicación web completa para gestionar las operaciones diarias de un estudio contable. Diseñada para reemplazar un sistema basado en Airtable + n8n, ofrece:
+Kuenta es una aplicación web completa para gestionar las operaciones diarias de un estudio contable. Ofrece:
 
 - 🏢 **Gestión de clientes** con edición inline y credenciales encriptadas
 - 📋 **Servicios contables** con pricing automático y tracking de cobranza
