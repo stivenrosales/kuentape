@@ -669,6 +669,7 @@ export function FinanzasOverview({
           <FinanzaTableSimple
             data={todasTransacciones ?? []}
             total={todasTransacciones?.length ?? 0}
+            isAdmin={canEdit}
           />
         </div>
       )}
