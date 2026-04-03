@@ -43,7 +43,7 @@ export default function LoginPage() {
           </div>
           <div className="text-center">
             <h1 className="text-2xl font-bold tracking-tight text-foreground">
-              Sheila
+              Kuenta
             </h1>
             <p className="text-sm text-muted-foreground">Estudio Contable</p>
           </div>

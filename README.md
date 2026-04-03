@@ -1,6 +1,6 @@
 <div align="center">
 
-# 📊 Sheila — Estudio Contable
+# 📊 Kuenta — Estudio Contable
 
 **Sistema de gestión integral para estudios contables**
 
@@ -17,9 +17,9 @@
 
 </div>
 
-## 🧠 ¿Qué es Sheila?
+## 🧠 ¿Qué es Kuenta?
 
-Sheila es una aplicación web completa para gestionar las operaciones diarias de un estudio contable. Diseñada para reemplazar un sistema basado en Airtable + n8n, ofrece:
+Kuenta es una aplicación web completa para gestionar las operaciones diarias de un estudio contable. Diseñada para reemplazar un sistema basado en Airtable + n8n, ofrece:
 
 - 🏢 **Gestión de clientes** con edición inline y credenciales encriptadas
 - 📋 **Servicios contables** con pricing automático y tracking de cobranza
@@ -100,10 +100,10 @@ pnpm dev
 
 | Email | Password | Rol |
 |-------|----------|-----|
-| `admin@sheila.pe` | `admin123` | 👑 Gerencia |
-| `gabriela@sheila.pe` | `contador123` | 📋 Contador |
-| `leo@sheila.pe` | `contador123` | 📋 Contador |
-| `ventas@sheila.pe` | `ventas123` | 🤝 Ventas |
+| `admin@kuenta.pe` | `admin123` | 👑 Gerencia |
+| `gabriela@kuenta.pe` | `contador123` | 📋 Contador |
+| `leo@kuenta.pe` | `contador123` | 📋 Contador |
+| `ventas@kuenta.pe` | `ventas123` | 🤝 Ventas |
 
 ## 📁 Estructura del Proyecto
 

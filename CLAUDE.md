@@ -1,6 +1,6 @@
 @AGENTS.md
 
-# Sheila Estudio Contable — Project Rules
+# Kuenta Estudio Contable — Project Rules
 
 ## Stack
 - Next.js 15 App Router + TypeScript + pnpm

@@ -20,7 +20,7 @@ const fontMono = Roboto_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Sheila Estudio Contable",
+  title: "Kuenta Estudio Contable",
   description: "Sistema de gestión contable",
 };
 

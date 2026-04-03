@@ -150,7 +150,7 @@ export function AppSidebar({ userName, userEmail, userRole }: AppSidebarProps) {
           {!isCollapsed && (
             <div className="flex flex-col overflow-hidden">
               <span className="truncate text-sm font-bold text-sidebar-foreground">
-                Sheila
+                Kuenta
               </span>
               <span className="truncate text-[10px] text-muted-foreground">
                 Estudio Contable

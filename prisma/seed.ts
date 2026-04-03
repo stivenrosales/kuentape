@@ -57,29 +57,29 @@ async function main() {
   const passwordHash = await bcrypt.hash(password, 12);
 
   await prisma.user.upsert({
-    where: { email: "admin@sheila.pe" },
+    where: { email: "admin@kuenta.pe" },
     update: {},
     create: {
       nombre: "Administrador",
       apellido: "Sistema",
-      email: "admin@sheila.pe",
+      email: "admin@kuenta.pe",
       passwordHash,
       role: "GERENCIA",
       activo: true,
     },
   });
-  console.log("✓ Usuario GERENCIA creado: admin@sheila.pe");
+  console.log("✓ Usuario GERENCIA creado: admin@kuenta.pe");
 
   // === DEMO DATA ===
   console.log("Creando datos de demostración...");
 
   // Contadores
   const contadores = [
-    { nombre: "Gabriela", apellido: "López", email: "gabriela@sheila.pe" },
-    { nombre: "Leo", apellido: "Martínez", email: "leo@sheila.pe" },
-    { nombre: "Zulma", apellido: "Rodríguez", email: "zulma@sheila.pe" },
-    { nombre: "Milagros", apellido: "Fernández", email: "milagros@sheila.pe" },
-    { nombre: "Emely", apellido: "Torres", email: "emely@sheila.pe" },
+    { nombre: "Gabriela", apellido: "López", email: "gabriela@kuenta.pe" },
+    { nombre: "Leo", apellido: "Martínez", email: "leo@kuenta.pe" },
+    { nombre: "Zulma", apellido: "Rodríguez", email: "zulma@kuenta.pe" },
+    { nombre: "Milagros", apellido: "Fernández", email: "milagros@kuenta.pe" },
+    { nombre: "Emely", apellido: "Torres", email: "emely@kuenta.pe" },
   ];
 
   const contadorIds: string[] = [];
@@ -100,18 +100,18 @@ async function main() {
 
   // Ventas user
   await prisma.user.upsert({
-    where: { email: "ventas@sheila.pe" },
+    where: { email: "ventas@kuenta.pe" },
     update: {},
     create: {
       nombre: "Sandy",
       apellido: "Pérez",
-      email: "ventas@sheila.pe",
+      email: "ventas@kuenta.pe",
       passwordHash: await bcrypt.hash("ventas123", 12),
       role: "VENTAS",
       activo: true,
     },
   });
-  console.log("✓ Usuario VENTAS creado: ventas@sheila.pe");
+  console.log("✓ Usuario VENTAS creado: ventas@kuenta.pe");
 
   // Clientes (Personas)
   const empresas = [
@@ -253,7 +253,7 @@ async function main() {
   // Finanzas (some payments for Marzo)
   const bcpCuenta = await prisma.cuentaBancaria.findFirst({ where: { nombre: "BCP Corriente" } });
   const efectivo = await prisma.cuentaBancaria.findFirst({ where: { nombre: "Efectivo" } });
-  const admin = await prisma.user.findUnique({ where: { email: "admin@sheila.pe" } });
+  const admin = await prisma.user.findUnique({ where: { email: "admin@kuenta.pe" } });
 
   if (bcpCuenta && efectivo && admin) {
     await prisma.finanza.createMany({
