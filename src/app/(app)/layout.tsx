@@ -29,11 +29,11 @@ export default async function AppLayout({
         userEmail={userEmail}
         userRole={userRole}
       />
-      <SidebarInset>
+      <SidebarInset className="min-w-0 overflow-x-hidden">
         <Topbar userName={userName} userRole={userRole} />
-        <main className="flex flex-1 flex-col gap-4 p-4 md:p-6">
+        <div className="flex flex-1 flex-col gap-4 p-4 md:p-6 min-w-0">
           {children}
-        </main>
+        </div>
       </SidebarInset>
     </SidebarProvider>
   );

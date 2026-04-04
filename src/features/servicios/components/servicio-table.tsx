@@ -137,10 +137,10 @@ function ServicioActions({
 
   return (
     <div className="flex items-center gap-1">
-      <Button variant="ghost" size="sm" className="h-7 w-7 p-0" title="Ver detalle" render={<Link href={`/servicios/${row.id}`} />}>
+      <Link href={`/servicios/${row.id}`} className="inline-flex items-center justify-center h-7 w-7 rounded-md hover:bg-muted transition-colors" title="Ver detalle">
         <Eye className="size-3.5" />
         <span className="sr-only">Ver detalle</span>
-      </Button>
+      </Link>
 
       {!showDesarchivar && row.estadoCobranza !== "COBRADO" && (
         <Button

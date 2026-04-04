@@ -14,17 +14,14 @@ const ROLE_ROUTES: Record<string, string[]> = {
     "/clientes",
     "/servicios",
     "/finanzas",
-    "/cobranzas",
     "/incidencias",
     "/libros",
     "/prospectos",
-    "/reportes",
   ],
   CONTADOR: [
     "/dashboard",
     "/clientes",
     "/servicios",
-    "/cobranzas",
     "/incidencias",
     "/libros",
   ],
@@ -65,5 +62,7 @@ export default middleware((req) => {
 });
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.png$).*)"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpe?g|gif|svg|ico|webp|avif)$).*)",
+  ],
 };

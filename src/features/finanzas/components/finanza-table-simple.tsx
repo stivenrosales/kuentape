@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
+import { ArrowUp, ArrowDown, ArrowUpDown, Circle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -131,13 +131,7 @@ export function FinanzaTableSimple({
     <>
       <div className="rounded-lg border border-border bg-card shadow-sm overflow-hidden">
         <table className="w-full text-sm border-collapse" style={{ tableLayout: "fixed" }}>
-          <colgroup>
-            <col style={{ width: "10%" }} />
-            <col style={{ width: "34%" }} />
-            <col style={{ width: "18%" }} />
-            <col style={{ width: "18%" }} />
-            <col style={{ width: "20%" }} />
-          </colgroup>
+          <colgroup><col style={{ width: "9%" }} /><col style={{ width: "31%" }} /><col style={{ width: "16%" }} /><col style={{ width: "16%" }} /><col style={{ width: "18%" }} /><col style={{ width: "10%" }} /></colgroup>
           <thead>
             <tr className="border-b border-border bg-muted/50">
               <SortableHeader
@@ -175,13 +169,16 @@ export function FinanzaTableSimple({
                 currentDir={sortDir}
                 onSort={handleSort}
               />
+              <th className="px-3 py-2.5 text-center text-[10px] uppercase tracking-wider font-medium text-muted-foreground">
+                Estado
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
             {sorted.length === 0 ? (
               <tr>
                 <td
-                  colSpan={5}
+                  colSpan={6}
                   className="py-12 text-center text-sm text-muted-foreground"
                 >
                   No hay transacciones registradas.
@@ -228,6 +225,16 @@ export function FinanzaTableSimple({
                   </td>
                   <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">
                     {formatDate(row.fecha)}
+                  </td>
+                  <td className="px-3 py-2 text-center">
+                    <Circle
+                      className={cn(
+                        "h-3 w-3 inline-block",
+                        row.validado
+                          ? "fill-emerald-500 text-emerald-500"
+                          : "fill-muted-foreground/30 text-muted-foreground/30"
+                      )}
+                    />
                   </td>
                 </tr>
               ))

@@ -14,6 +14,7 @@ export interface CajaChicaRow {
   id: string;
   tipo: "INGRESO" | "GASTO";
   concepto: string;
+  categoriaGasto: string | null;
   monto: number;
   fecha: Date;
   saldoAcumulado: number;

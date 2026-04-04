@@ -69,9 +69,25 @@ export async function updateConstanciaAction(id: string, url: string) {
   const libro = await prisma.libro.findUnique({ where: { id } });
   if (!libro) return { error: "Libro no encontrado" };
 
+  // Subir constancia → auto-completar
   await prisma.libro.update({
     where: { id },
-    data: { constanciaUrl: url || null },
+    data: { constanciaUrl: url || null, completado: !!url },
+  });
+
+  revalidatePath("/libros");
+  return { success: true, completado: !!url };
+}
+
+export async function removeConstanciaAction(id: string) {
+  await authorizeAction(["GERENCIA", "ADMINISTRADOR", "CONTADOR"]);
+
+  const libro = await prisma.libro.findUnique({ where: { id } });
+  if (!libro) return { error: "Libro no encontrado" };
+
+  await prisma.libro.update({
+    where: { id },
+    data: { constanciaUrl: null, completado: false },
   });
 
   revalidatePath("/libros");

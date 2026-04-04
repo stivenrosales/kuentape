@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="120 100 560 570" width="100%" height="100%">
+    <defs>
+        <!-- Importando la fuente Montserrat para asegurar una coincidencia exacta con el logo -->
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&amp;display=swap');
+
+            .main-text {
+                font-family: 'Montserrat', sans-serif;
+                font-weight: 800;
+                font-size: 50px;
+                fill: #1b296b;
+            }
+
+            .sub-text {
+                font-family: 'Montserrat', sans-serif;
+                font-weight: 400;
+                font-size: 24px;
+                fill: #145c73;
+                letter-spacing: 0.35em;
+            }
+        </style>
+
+        <!-- Degradado para la flecha ascendente -->
+        <linearGradient id="arrowGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#46bce5" />
+            <stop offset="100%" stop-color="#16738b" />
+        </linearGradient>
+
+        <!-- Máscara de recorte para asegurar que el final superior de la "C" tenga un corte perfectamente vertical y paralelo a la barra -->
+        <clipPath id="c-cut">
+            <polygon points="0,0 415,0 415,250 800,250 800,800 0,800" />
+        </clipPath>
+    </defs>
+
+    <!-- ============================================== -->
+    <!-- ICONO CENTRAL                                  -->
+    <!-- ============================================== -->
+
+    <!-- La letra "C" estilizada -->
+    <path d="M 440,150
+             A 150,150 0 0,0 200,270
+             A 150,150 0 0,0 400,410"
+          fill="none"
+          stroke="#1b296b"
+          stroke-width="34"
+          stroke-linecap="butt"
+          clip-path="url(#c-cut)" />
+
+    <!-- Remate inferior redondeado -->
+    <circle cx="400" cy="410" r="17" fill="#1b296b" />
+
+    <!-- Gráfico de Barras -->
+    <polygon points="320,220 360,220 360,323.5 320,334" fill="#05a7df" />
+    <polygon points="375,180 415,180 415,309 375,319.5" fill="#88c440" />
+    <polygon points="430,120 470,120 470,294.5 430,305" fill="#16738b" />
+
+    <!-- Flecha Ascendente que cruza el gráfico -->
+    <polygon points="320,380 510,330 518,350 580,292 502,270 510,290 320,340" fill="url(#arrowGrad)" />
+
+    <!-- ============================================== -->
+    <!-- TEXTOS Y LÍNEAS                                -->
+    <!-- ============================================== -->
+
+    <text x="400" y="570" text-anchor="middle" class="main-text">ESTUDIO CONTABLE</text>
+    <line x1="150" y1="595" x2="650" y2="595" stroke="#1b296b" stroke-width="4.5" />
+    <text x="400" y="645" text-anchor="middle" class="sub-text">CONTADORES &amp; ASOCIADOS</text>
+</svg>

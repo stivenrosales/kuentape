@@ -4,9 +4,12 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Loader2Icon } from "lucide-react";
 import { ContextMenuRow } from "@/components/context-menu-row";
-import { deleteLeadAction } from "@/features/leads/actions";
+import { deleteLeadAction, getLeadDetailAction } from "@/features/leads/actions";
+import { LeadDetailDialog } from "./lead-detail-dialog";
 import { cn } from "@/lib/utils";
+import type { LeadKanbanCard } from "../queries-kanban";
 
 interface LeadRow {
   id: string;
@@ -56,7 +59,7 @@ function SortableHeader({
   return (
     <th
       className={cn(
-        "px-3 py-2.5 text-left text-xs font-medium cursor-pointer select-none transition-colors hover:text-foreground align-middle",
+        "px-3 py-2.5 text-left text-[10px] uppercase tracking-wider font-medium cursor-pointer select-none transition-colors hover:text-foreground align-middle",
         isActive ? "text-foreground" : "text-muted-foreground"
       )}
       onClick={() => onSort(sortKey)}
@@ -73,11 +76,20 @@ function SortableHeader({
   );
 }
 
-export function LeadTableSimple({ data }: { data: LeadRow[] }) {
+export function LeadTableSimple({ data, staff = [] }: { data: LeadRow[]; staff?: { id: string; nombre: string; apellido: string }[] }) {
   const router = useRouter();
 
   const [sortKey, setSortKey] = React.useState<SortKey>("nombre");
   const [sortDir, setSortDir] = React.useState<SortDir>("asc");
+  const [selectedLead, setSelectedLead] = React.useState<LeadKanbanCard | null>(null);
+  const [loadingId, setLoadingId] = React.useState<string | null>(null);
+
+  async function handleRowClick(leadId: string) {
+    setLoadingId(leadId);
+    const lead = await getLeadDetailAction(leadId);
+    setLoadingId(null);
+    if (lead) setSelectedLead(lead as LeadKanbanCard);
+  }
 
   function handleSort(key: SortKey) {
     if (sortKey === key) {
@@ -108,6 +120,7 @@ export function LeadTableSimple({ data }: { data: LeadRow[] }) {
   const sorted = sortItems(data);
 
   return (
+    <>
     <div className="rounded-lg border border-border bg-card shadow-sm overflow-hidden">
       <table className="w-full text-sm border-collapse" style={{ tableLayout: "fixed" }}>
         <colgroup><col style={{ width: "25%" }} /><col style={{ width: "13%" }} /><col style={{ width: "12%" }} /><col style={{ width: "10%" }} /><col style={{ width: "26%" }} /><col style={{ width: "14%" }} /></colgroup>
@@ -132,7 +145,7 @@ export function LeadTableSimple({ data }: { data: LeadRow[] }) {
             sorted.map((lead, i) => (
               <ContextMenuRow
                 key={lead.id}
-                onClick={() => router.push(`/prospectos/${lead.id}`)}
+                onClick={() => handleRowClick(lead.id)}
                 className={`cursor-pointer transition-colors hover:bg-primary/5 ${i % 2 === 0 ? "bg-muted/10" : "bg-background"} ${lead.estado === "PERDIDO" ? "opacity-50" : ""}`}
                 confirmMessage={`¿Seguro que querés eliminar a "${lead.nombre} ${lead.apellido}"?`}
                 onDelete={async () => {
@@ -140,7 +153,7 @@ export function LeadTableSimple({ data }: { data: LeadRow[] }) {
                   router.refresh();
                 }}
               >
-                <td className="px-3 py-2 font-medium truncate">{lead.nombre} {lead.apellido}</td>
+                <td className="px-3 py-2 text-xs font-medium truncate">{lead.nombre} {lead.apellido}</td>
                 <td className="px-3 py-2 text-xs font-mono">{lead.celular}</td>
                 <td className="px-3 py-2">
                   <Badge className={`text-[10px] ${ESTADO_STYLE[lead.estado] ?? ESTADO_STYLE.NUEVO}`}>
@@ -158,5 +171,17 @@ export function LeadTableSimple({ data }: { data: LeadRow[] }) {
         </tbody>
       </table>
     </div>
+
+    {selectedLead && (
+      <LeadDetailDialog
+        lead={selectedLead}
+        staff={staff}
+        onClose={() => { setSelectedLead(null); router.refresh(); }}
+        onMove={async () => {}}
+        onUpdated={(updated) => setSelectedLead(updated)}
+        onConverted={() => { setSelectedLead(null); router.refresh(); }}
+      />
+    )}
+    </>
   );
 }

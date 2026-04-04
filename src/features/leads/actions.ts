@@ -174,3 +174,19 @@ export async function deleteLeadAction(id: string) {
   revalidatePath("/prospectos");
   return { data: true };
 }
+
+/** Load lead detail for popup */
+export async function getLeadDetailAction(id: string) {
+  await authorizeAction(["GERENCIA", "ADMINISTRADOR", "VENTAS"]);
+  const lead = await prisma.lead.findUnique({
+    where: { id },
+    select: {
+      id: true, nombre: true, apellido: true, dni: true, celular: true,
+      email: true, regimen: true, rubro: true, numTrabajadores: true,
+      estado: true, notas: true, createdAt: true,
+      asignadoA: { select: { id: true, nombre: true, apellido: true } },
+      convertidoA: { select: { id: true, razonSocial: true } },
+    },
+  });
+  return lead;
+}

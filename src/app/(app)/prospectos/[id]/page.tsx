@@ -53,10 +53,13 @@ export default async function ProspectoDetailPage({
         description={`Prospecto · Creado ${formatDate(lead.createdAt)}`}
       >
         <EstadoBadge estado={lead.estado} />
-        <Button variant="outline" render={<Link href={`/prospectos/${id}/editar`} />}>
+        <Link
+          href={`/prospectos/${id}/editar`}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-input bg-background px-3 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+        >
           <Pencil className="h-4 w-4" />
           Editar
-        </Button>
+        </Link>
         {canConvert && (
           <LeadConversionDialogTrigger
             lead={{
@@ -169,10 +172,10 @@ export default async function ProspectoDetailPage({
                     RUC: {lead.convertidoA.ruc}
                   </p>
                 </div>
-                <Button variant="outline" size="sm" render={<Link href={`/clientes/${lead.convertidoA.id}`} />}>
+                <Link href={`/clientes/${lead.convertidoA.id}`} className="inline-flex items-center gap-1.5 rounded-lg border border-input bg-background px-3 py-1.5 text-xs font-medium hover:bg-accent hover:text-accent-foreground transition-colors">
                   Ver cliente
-                  <ArrowRight className="h-4 w-4 ml-1" />
-                </Button>
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
             </div>
           )}

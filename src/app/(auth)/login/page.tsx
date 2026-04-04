@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { loginAction } from "@/features/auth/actions";
-import { Loader2, Lock, Mail, BookOpen } from "lucide-react";
+import { Loader2, Lock, Mail } from "lucide-react";
 
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
@@ -33,20 +33,14 @@ export default function LoginPage() {
           boxShadow: "var(--shadow-2xl)",
         }}
       >
-        {/* Logo / Header */}
-        <div className="mb-8 flex flex-col items-center gap-3">
-          <div
-            className="flex h-16 w-16 items-center justify-center rounded-[var(--radius)] bg-primary"
-            style={{ boxShadow: "var(--shadow-md)" }}
-          >
-            <BookOpen className="h-8 w-8 text-primary-foreground" />
-          </div>
-          <div className="text-center">
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">
-              Kuenta
-            </h1>
-            <p className="text-sm text-muted-foreground">Estudio Contable</p>
-          </div>
+        {/* Logo */}
+        <div className="mb-8 flex justify-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo.svg"
+            alt="C&A — Contadores y Asociados"
+            className="h-48 w-48 object-contain"
+          />
         </div>
 
         {/* Divider */}

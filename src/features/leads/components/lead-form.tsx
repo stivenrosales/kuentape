@@ -53,7 +53,7 @@ export function LeadForm({ mode, leadId, defaultValues, staff }: LeadFormProps) 
     control,
     formState: { errors, isSubmitting },
   } = useForm<CreateLeadInput>({
-    resolver: zodResolver(createLeadSchema),
+    resolver: zodResolver(createLeadSchema as any),
     defaultValues: {
       nombre: "",
       apellido: "",
@@ -172,7 +172,7 @@ export function LeadForm({ mode, leadId, defaultValues, staff }: LeadFormProps) 
               control={control}
               name="regimen"
               render={({ field }) => (
-                <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                <Select value={field.value ?? ""} onValueChange={(v) => v && field.onChange(v)}>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Seleccionar..." />
                   </SelectTrigger>
@@ -192,7 +192,7 @@ export function LeadForm({ mode, leadId, defaultValues, staff }: LeadFormProps) 
               control={control}
               name="rubro"
               render={({ field }) => (
-                <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                <Select value={field.value ?? ""} onValueChange={(v) => v && field.onChange(v)}>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Seleccionar..." />
                   </SelectTrigger>
@@ -225,7 +225,7 @@ export function LeadForm({ mode, leadId, defaultValues, staff }: LeadFormProps) 
               control={control}
               name="asignadoAId"
               render={({ field }) => (
-                <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                <Select value={field.value ?? ""} onValueChange={(v) => v && field.onChange(v)}>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Sin asignar" />
                   </SelectTrigger>

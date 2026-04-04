@@ -488,7 +488,7 @@ export function ServicioListEnhanced({
 
   return (
     <>
-      <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+      <div className="rounded-lg border border-border bg-card shadow-sm overflow-hidden">
         <table className="w-full text-sm border-collapse" style={{ tableLayout: "fixed" }}>
           <colgroup><col style={{ width: "5%" }} /><col style={{ width: "30%" }} /><col style={{ width: "15%" }} /><col style={{ width: "13%" }} /><col style={{ width: "13%" }} /><col style={{ width: "13%" }} /><col style={{ width: "11%" }} /></colgroup>
           <thead>
@@ -565,7 +565,7 @@ export function ServicioListEnhanced({
 // ─── Loading skeleton exportado ───────────────────────────────────────────────
 export function ServicioListSkeleton() {
   return (
-    <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+    <div className="rounded-lg border border-border bg-card shadow-sm overflow-hidden">
       <table className="w-full text-sm border-collapse">
         <thead>
           <tr className="border-b border-border bg-muted/50">

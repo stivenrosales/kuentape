@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import { toast } from "sonner";
 import {
   Building2,
@@ -23,23 +22,9 @@ import {
   SelectItem,
   SelectTrigger,
 } from "@/components/ui/select";
-import { KPICard } from "@/components/kpi-card";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { EmptyState } from "@/components/empty-state";
+import { IncidenciaDetailDialog } from "@/features/incidencias/components/incidencia-detail-dialog";
+import { ServicioDetailDialog } from "@/features/servicios/components/servicio-detail-dialog";
 import { CredentialReveal } from "@/features/personas/components/credential-reveal";
 import { updatePersonaAction, updateCredentialsAction } from "@/features/personas/actions";
 import { formatCurrency, formatDate } from "@/lib/format";
@@ -116,6 +101,8 @@ interface ClienteDetailClientProps {
   incidencias: IncidenciaRow[];
   libros: LibroRow[];
   canManage: boolean;
+  hideHeader?: boolean;
+  showIdentityRows?: boolean;
 }
 
 // ── Label maps ─────────────────────────────────────────────────────────────────
@@ -299,7 +286,7 @@ function InlineText({
         onBlur={commit}
         onKeyDown={handleKeyDown}
         disabled={saving}
-        className={`w-full rounded border border-border bg-background px-1.5 py-0.5 text-sm outline-none ring-1 ring-primary/40 focus:ring-primary disabled:opacity-60 ${inputClassName}`}
+        className={`w-full rounded border border-primary/40 bg-background px-1.5 py-0.5 text-xs font-medium outline-none disabled:opacity-60 ${inputClassName}`}
       />
     );
   }
@@ -308,9 +295,9 @@ function InlineText({
     <span
       onClick={startEdit}
       title={readOnly ? undefined : "Clic para editar"}
-      className={`block min-h-[1.5rem] cursor-text rounded px-1 py-0.5 text-sm transition-colors hover:bg-muted/50 ${readOnly ? "cursor-default hover:bg-transparent" : ""} ${className}`}
+      className={`block rounded border border-transparent px-1.5 py-0.5 text-xs font-medium transition-colors hover:bg-muted/40 ${readOnly ? "cursor-default hover:bg-transparent" : "cursor-text"} ${className}`}
     >
-      {val || <span className="text-muted-foreground/60">{placeholder}</span>}
+      {val || <span className="text-muted-foreground/50">{placeholder}</span>}
     </span>
   );
 }
@@ -375,7 +362,7 @@ function InlineNumber({ value, onSave, min = 0, className = "" }: InlineNumberPr
         onBlur={commit}
         onKeyDown={handleKeyDown}
         disabled={saving}
-        className={`w-24 rounded border border-border bg-background px-1.5 py-0.5 text-sm outline-none ring-1 ring-primary/40 focus:ring-primary disabled:opacity-60 ${className}`}
+        className={`w-24 rounded border border-primary/40 bg-background px-1.5 py-0.5 text-xs font-medium outline-none disabled:opacity-60 ${className}`}
       />
     );
   }
@@ -384,9 +371,9 @@ function InlineNumber({ value, onSave, min = 0, className = "" }: InlineNumberPr
     <span
       onClick={startEdit}
       title="Clic para editar"
-      className={`block min-h-[1.5rem] cursor-text rounded px-1 py-0.5 text-sm transition-colors hover:bg-muted/50 ${className}`}
+      className={`block rounded border border-transparent px-1.5 py-0.5 text-xs font-medium cursor-text transition-colors hover:bg-muted/40 ${className}`}
     >
-      {value !== null && value !== undefined ? value : <span className="text-muted-foreground/60">—</span>}
+      {value !== null && value !== undefined ? value : <span className="text-muted-foreground/50">—</span>}
     </span>
   );
 }
@@ -406,9 +393,9 @@ function InlineSelect<T extends string>({
 }: InlineSelectProps<T>) {
   const [saving, setSaving] = React.useState(false);
 
-  async function handleChange(newVal: string) {
+  async function handleChange(newVal: string | null) {
+    if (!newVal || newVal === value) return;
     const next = newVal as T;
-    if (next === value) return;
     setSaving(true);
     await onSave(next);
     setSaving(false);
@@ -418,7 +405,7 @@ function InlineSelect<T extends string>({
 
   return (
     <Select value={value} onValueChange={handleChange}>
-      <SelectTrigger className={`h-auto px-2 py-0.5 text-sm border-transparent bg-transparent hover:bg-muted/40 transition-colors w-auto gap-1 ${saving ? "opacity-60" : ""} ${className}`}>
+      <SelectTrigger className={`h-auto px-1.5 py-0.5 text-xs border-transparent bg-transparent hover:bg-muted/40 transition-colors w-auto gap-0.5 font-medium rounded ${saving ? "opacity-60" : ""} ${className}`}>
         {current?.label ?? value}
       </SelectTrigger>
       <SelectContent>
@@ -470,9 +457,22 @@ function InlineToggle({ value, label, onSave, readOnly = false }: InlineTogglePr
 
 // ── Section label ──────────────────────────────────────────────────────────────
 
-function SectionLabel({ children }: { children: React.ReactNode }) {
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <p className="text-xs font-medium text-muted-foreground">{children}</p>
+    <div className="pt-4 border-t border-border/60">
+      <h3 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">{title}</h3>
+      <div className="space-y-1">{children}</div>
+    </div>
+  );
+}
+
+function EditRow({ icon, label, children }: { icon: React.ReactNode; label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-2 text-xs min-h-[2rem] py-0.5">
+      <span className="text-muted-foreground shrink-0">{icon}</span>
+      <span className="text-muted-foreground w-28 shrink-0">{label}:</span>
+      <span className="flex-1 min-w-0">{children}</span>
+    </div>
   );
 }
 
@@ -499,29 +499,27 @@ function CredencialesSection({ personaId, canManage }: { personaId: string; canM
   }
 
   return (
-    <section className="rounded-lg border border-border bg-card shadow-sm p-4">
-      <h3 className="text-xs font-medium text-muted-foreground mb-3 flex items-center gap-1.5">
-        <CreditCard className="h-3.5 w-3.5" /> Credenciales
-      </h3>
+    <div className="pt-4 border-t border-border/60">
+      <h3 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Credenciales</h3>
       {loading ? (
         <p className="text-xs text-muted-foreground">Cargando...</p>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-3">
-          <Field label="SOL Usuario">
+        <div className="space-y-1">
+          <EditRow icon={<CreditCard className="h-3.5 w-3.5" />} label="SOL Usuario">
             <InlineText value={creds?.claveSolUsuario ?? null} placeholder="—" onSave={(v) => saveCred("claveSolUsuario", v)} readOnly={!canManage} className="font-mono" />
-          </Field>
-          <Field label="SOL Clave">
+          </EditRow>
+          <EditRow icon={<CreditCard className="h-3.5 w-3.5" />} label="SOL Clave">
             <InlineText value={creds?.claveSolClave ?? null} placeholder="—" onSave={(v) => saveCred("claveSolClave", v)} readOnly={!canManage} className="font-mono" />
-          </Field>
-          <Field label="AFP Usuario">
+          </EditRow>
+          <EditRow icon={<CreditCard className="h-3.5 w-3.5" />} label="AFP Usuario">
             <InlineText value={creds?.afpUsuario ?? null} placeholder="—" onSave={(v) => saveCred("afpUsuario", v)} readOnly={!canManage} className="font-mono" />
-          </Field>
-          <Field label="AFP Clave">
+          </EditRow>
+          <EditRow icon={<CreditCard className="h-3.5 w-3.5" />} label="AFP Clave">
             <InlineText value={creds?.afpClave ?? null} placeholder="—" onSave={(v) => saveCred("afpClave", v)} readOnly={!canManage} className="font-mono" />
-          </Field>
+          </EditRow>
         </div>
       )}
-    </section>
+    </div>
   );
 }
 
@@ -542,9 +540,23 @@ export function ClienteDetailClient({
   incidencias,
   libros,
   canManage,
+  hideHeader = false,
+  showIdentityRows = false,
 }: ClienteDetailClientProps) {
   const [persona, setPersona] = React.useState<PersonaDetail>(initialPersona);
   const [saveError, setSaveError] = React.useState<string | null>(null);
+  const [selectedServicio, setSelectedServicio] = React.useState<any>(null);
+  const [selectedIncidenciaId, setSelectedIncidenciaId] = React.useState<string | null>(null);
+
+  async function openServicio(id: string) {
+    try {
+      const res = await fetch(`/api/servicios/${id}`);
+      if (res.ok) {
+        const data = await res.json();
+        setSelectedServicio(data);
+      }
+    } catch { /* silent */ }
+  }
 
   const deadlineDay = sunatDeadlineDay(persona.ruc);
 
@@ -607,7 +619,7 @@ export function ClienteDetailClient({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Error banner */}
       {saveError && (
         <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
@@ -615,122 +627,153 @@ export function ClienteDetailClient({
         </div>
       )}
 
-      {/* Header — compacto */}
-      <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0 flex-1">
+      {/* Header — oculto en popup (ya lo muestra el dialog) */}
+      {!hideHeader && (
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            {canManage ? (
+              <InlineText
+                value={persona.razonSocial}
+                onSave={(v) => save("razonSocial", v)}
+                className="text-lg font-bold tracking-tight text-foreground"
+                inputClassName="text-lg font-bold tracking-tight"
+              />
+            ) : (
+              <h1 className="text-lg font-bold tracking-tight">{persona.razonSocial}</h1>
+            )}
+            <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-muted-foreground">
+              <span className="font-mono">{persona.ruc}</span>
+              <span>·</span>
+              <Badge className="bg-muted/60 text-foreground border-transparent text-[10px] px-1.5 py-0">{TIPO_LABEL[persona.tipoPersona]}</Badge>
+              <span>·</span>
+              <Badge variant="outline" className="text-[10px] px-1.5 py-0">{REGIMEN_LABEL[persona.regimen]}</Badge>
+              <span>·</span>
+              <span>Vence día {deadlineDay}</span>
+              <span>·</span>
+              <span>{persona._count.servicios} servicio{persona._count.servicios !== 1 ? "s" : ""}</span>
+              <span>·</span>
+              <span>{persona._count.incidencias} incidencia{persona._count.incidencias !== 1 ? "s" : ""}</span>
+            </div>
+          </div>
           {canManage ? (
-            <InlineText
-              value={persona.razonSocial}
-              onSave={(v) => save("razonSocial", v)}
-              className="text-lg font-bold tracking-tight text-foreground"
-              inputClassName="text-lg font-bold tracking-tight"
+            <InlineSelect
+              value={persona.estado}
+              options={[
+                { value: "ACTIVO" as EstadoPersona, label: "Activo" },
+                { value: "INACTIVO" as EstadoPersona, label: "Inactivo" },
+                { value: "ARCHIVADO" as EstadoPersona, label: "Archivado" },
+              ]}
+              onSave={(v) => save("estado", v)}
             />
           ) : (
-            <h1 className="text-lg font-bold tracking-tight">{persona.razonSocial}</h1>
+            <Badge className={ESTADO_BADGE[persona.estado]}>{ESTADO_LABEL[persona.estado]}</Badge>
           )}
-          <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-muted-foreground">
-            <span className="font-mono">{persona.ruc}</span>
-            <span>·</span>
-            <Badge className="bg-muted/60 text-foreground border-transparent text-[10px] px-1.5 py-0">{TIPO_LABEL[persona.tipoPersona]}</Badge>
-            <span>·</span>
-            <Badge variant="outline" className="text-[10px] px-1.5 py-0">{REGIMEN_LABEL[persona.regimen]}</Badge>
-            <span>·</span>
-            <span>Vence día {deadlineDay}</span>
-            <span>·</span>
-            <span>{persona._count.servicios} servicio{persona._count.servicios !== 1 ? "s" : ""}</span>
-            <span>·</span>
-            <span>{persona._count.incidencias} incidencia{persona._count.incidencias !== 1 ? "s" : ""}</span>
-          </div>
         </div>
-        {canManage ? (
-          <InlineSelect
-            value={persona.estado}
-            options={[
-              { value: "ACTIVO" as EstadoPersona, label: "Activo" },
-              { value: "INACTIVO" as EstadoPersona, label: "Inactivo" },
-              { value: "ARCHIVADO" as EstadoPersona, label: "Archivado" },
-            ]}
-            onSave={(v) => save("estado", v)}
-          />
-        ) : (
-          <Badge className={ESTADO_BADGE[persona.estado]}>{ESTADO_LABEL[persona.estado]}</Badge>
-        )}
-      </div>
+      )}
+
+      {/* ── Identidad (solo en popup) ── */}
+      {showIdentityRows && (
+        <Section title="Identidad">
+          <EditRow icon={<Building2 className="h-3.5 w-3.5" />} label="Razón Social">
+            {canManage ? (
+              <InlineText value={persona.razonSocial} onSave={(v) => save("razonSocial", v)} />
+            ) : <span>{persona.razonSocial}</span>}
+          </EditRow>
+          <EditRow icon={<Building2 className="h-3.5 w-3.5" />} label="RUC">
+            {canManage ? (
+              <InlineText value={persona.ruc} onSave={(v) => save("ruc", v)} className="font-mono" inputClassName="font-mono" />
+            ) : <span className="font-mono">{persona.ruc}</span>}
+          </EditRow>
+          <EditRow icon={<Building2 className="h-3.5 w-3.5" />} label="Tipo Persona">
+            {canManage ? (
+              <InlineSelect value={persona.tipoPersona} options={[
+                { value: "JURIDICA" as TipoPersona, label: "Jurídica" },
+                { value: "NATURAL" as TipoPersona, label: "Natural" },
+                { value: "IMMUNOTEC" as TipoPersona, label: "Immunotec" },
+                { value: "FOUR_LIFE" as TipoPersona, label: "4Life" },
+                { value: "RXH" as TipoPersona, label: "RxH" },
+              ]} onSave={(v) => save("tipoPersona", v)} />
+            ) : <span>{TIPO_LABEL[persona.tipoPersona]}</span>}
+          </EditRow>
+          <EditRow icon={<Building2 className="h-3.5 w-3.5" />} label="Estado">
+            {canManage ? (
+              <InlineSelect value={persona.estado} options={[
+                { value: "ACTIVO" as EstadoPersona, label: "Activo" },
+                { value: "INACTIVO" as EstadoPersona, label: "Inactivo" },
+                { value: "ARCHIVADO" as EstadoPersona, label: "Archivado" },
+              ]} onSave={(v) => save("estado", v)} />
+            ) : <span>{ESTADO_LABEL[persona.estado]}</span>}
+          </EditRow>
+        </Section>
+      )}
 
       {/* ── Datos Fiscales ── */}
-      <section className="rounded-lg border border-border bg-card shadow-sm p-4">
-        <h3 className="text-xs font-medium text-muted-foreground mb-3 flex items-center gap-1.5">
-          <Building2 className="h-3.5 w-3.5" /> Datos Fiscales
-        </h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-3">
-          <Field label="Régimen">
-            {canManage ? (
-              <InlineSelect value={persona.regimen} options={[
-                { value: "MYPE" as Regimen, label: "MYPE" },
-                { value: "RER" as Regimen, label: "RER" },
-                { value: "REG" as Regimen, label: "General" },
-              ]} onSave={(v) => save("regimen", v)} />
-            ) : <span className="text-sm">{REGIMEN_LABEL[persona.regimen]}</span>}
-          </Field>
-          <Field label="Contabilidad">
-            {canManage ? (
-              <InlineSelect value={persona.tipoContabilidad} options={[
-                { value: "MANUAL" as TipoContabilidad, label: "Manual" },
-                { value: "COMPUTARIZADA" as TipoContabilidad, label: "Computarizada" },
-              ]} onSave={(v) => save("tipoContabilidad", v)} />
-            ) : <span className="text-sm">{persona.tipoContabilidad}</span>}
-          </Field>
-          <Field label="Planilla">
-            <InlineToggle value={persona.planilla} label={persona.planilla ? "Sí" : "No"} onSave={(v) => save("planilla", v)} readOnly={!canManage} />
-          </Field>
-          <Field label="Detracciones">
-            <InlineToggle value={persona.detracciones} label={persona.detracciones ? "Sí" : "No"} onSave={(v) => save("detracciones", v)} readOnly={!canManage} />
-          </Field>
-          <Field label="Dirección" className="col-span-2">
-            <InlineText value={persona.direccion} placeholder="—" onSave={(v) => save("direccion", v || null)} readOnly={!canManage} />
-          </Field>
-          <Field label="Partida Electrónica">
-            <InlineText value={persona.partidaElectronica} placeholder="—" onSave={(v) => save("partidaElectronica", v || null)} readOnly={!canManage} />
-          </Field>
-          <Field label="N° Trabajadores">
-            {canManage ? <InlineNumber value={persona.numTrabajadores} onSave={(v) => save("numTrabajadores", v)} min={0} /> : <span className="text-sm">{persona.numTrabajadores ?? "—"}</span>}
-          </Field>
-        </div>
-      </section>
+      <Section title="Datos Fiscales">
+        <EditRow icon={<Building2 className="h-3.5 w-3.5" />} label="Régimen">
+          {canManage ? (
+            <InlineSelect value={persona.regimen} options={[
+              { value: "MYPE" as Regimen, label: "MYPE" },
+              { value: "RER" as Regimen, label: "RER" },
+              { value: "REG" as Regimen, label: "General" },
+            ]} onSave={(v) => save("regimen", v)} />
+          ) : <span className="text-xs">{REGIMEN_LABEL[persona.regimen]}</span>}
+        </EditRow>
+        <EditRow icon={<Building2 className="h-3.5 w-3.5" />} label="Contabilidad">
+          {canManage ? (
+            <InlineSelect value={persona.tipoContabilidad} options={[
+              { value: "MANUAL" as TipoContabilidad, label: "Manual" },
+              { value: "COMPUTARIZADA" as TipoContabilidad, label: "Computarizada" },
+            ]} onSave={(v) => save("tipoContabilidad", v)} />
+          ) : <span className="text-xs">{persona.tipoContabilidad}</span>}
+        </EditRow>
+        <EditRow icon={<Building2 className="h-3.5 w-3.5" />} label="Planilla">
+          <InlineToggle value={persona.planilla} label={persona.planilla ? "Sí" : "No"} onSave={(v) => save("planilla", v)} readOnly={!canManage} />
+        </EditRow>
+        <EditRow icon={<Building2 className="h-3.5 w-3.5" />} label="Detracciones">
+          <InlineToggle value={persona.detracciones} label={persona.detracciones ? "Sí" : "No"} onSave={(v) => save("detracciones", v)} readOnly={!canManage} />
+        </EditRow>
+        <EditRow icon={<Building2 className="h-3.5 w-3.5" />} label="Dirección">
+          <InlineText value={persona.direccion} placeholder="—" onSave={(v) => save("direccion", v || null)} readOnly={!canManage} />
+        </EditRow>
+        <EditRow icon={<Building2 className="h-3.5 w-3.5" />} label="Partida Elect.">
+          <InlineText value={persona.partidaElectronica} placeholder="—" onSave={(v) => save("partidaElectronica", v || null)} readOnly={!canManage} />
+        </EditRow>
+        <EditRow icon={<Users className="h-3.5 w-3.5" />} label="N° Trabajadores">
+          {canManage ? <InlineNumber value={persona.numTrabajadores} onSave={(v) => save("numTrabajadores", v)} min={0} /> : <span className="text-xs">{persona.numTrabajadores ?? "—"}</span>}
+        </EditRow>
+      </Section>
 
-      {/* ── Contacto y Representante ── */}
-      <section className="rounded-lg border border-border bg-card shadow-sm p-4">
-        <h3 className="text-xs font-medium text-muted-foreground mb-3 flex items-center gap-1.5">
-          <Users className="h-3.5 w-3.5" /> Contacto y Representante
-        </h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-3">
-          <Field label="Teléfono">
-            <InlineText value={persona.telefono} placeholder="—" onSave={(v) => save("telefono", v || null)} readOnly={!canManage} />
-          </Field>
-          <Field label="Email">
-            <InlineText value={persona.email} placeholder="—" onSave={(v) => save("email", v || null)} readOnly={!canManage} />
-          </Field>
-          <Field label="Contador">
-            <span className="text-sm">{persona.contadorAsignado.nombre} {persona.contadorAsignado.apellido}</span>
-          </Field>
-          <div />
-          <Field label="Rep. Legal">
-            <InlineText value={persona.representanteNombre} placeholder="—" onSave={(v) => save("representanteNombre", v || null)} readOnly={!canManage} />
-          </Field>
-          <Field label="DNI Rep.">
-            <InlineText value={persona.representanteDni} placeholder="—" onSave={(v) => save("representanteDni", v || null)} readOnly={!canManage} />
-          </Field>
-          <Field label="Tel. Rep.">
-            <InlineText value={persona.representanteTelefono} placeholder="—" onSave={(v) => save("representanteTelefono", v || null)} readOnly={!canManage} />
-          </Field>
-          <div />
-        </div>
-      </section>
+      {/* ── Contacto ── */}
+      <Section title="Contacto">
+        <EditRow icon={<Users className="h-3.5 w-3.5" />} label="Teléfono">
+          <InlineText value={persona.telefono} placeholder="—" onSave={(v) => save("telefono", v || null)} readOnly={!canManage} />
+        </EditRow>
+        <EditRow icon={<Users className="h-3.5 w-3.5" />} label="Email">
+          <InlineText value={persona.email} placeholder="—" onSave={(v) => save("email", v || null)} readOnly={!canManage} />
+        </EditRow>
+        <EditRow icon={<Users className="h-3.5 w-3.5" />} label="Contador">
+          <span className="text-xs font-medium">{persona.contadorAsignado.nombre} {persona.contadorAsignado.apellido}</span>
+        </EditRow>
+      </Section>
+
+      {/* ── Representante ── */}
+      <Section title="Representante Legal">
+        <EditRow icon={<Users className="h-3.5 w-3.5" />} label="Nombre">
+          <InlineText value={persona.representanteNombre} placeholder="—" onSave={(v) => save("representanteNombre", v || null)} readOnly={!canManage} />
+        </EditRow>
+        <EditRow icon={<Users className="h-3.5 w-3.5" />} label="DNI">
+          <InlineText value={persona.representanteDni} placeholder="—" onSave={(v) => save("representanteDni", v || null)} readOnly={!canManage} />
+        </EditRow>
+        <EditRow icon={<Users className="h-3.5 w-3.5" />} label="Teléfono">
+          <InlineText value={persona.representanteTelefono} placeholder="—" onSave={(v) => save("representanteTelefono", v || null)} readOnly={!canManage} />
+        </EditRow>
+      </Section>
 
       {/* ── Credenciales ── */}
       <CredencialesSection personaId={persona.id} canManage={canManage} />
 
       {/* Tabs */}
+      <div className="pt-4 border-t border-border/60">
       <Tabs defaultValue="servicios">
         <TabsList>
           <TabsTrigger value="servicios">
@@ -745,149 +788,145 @@ export function ClienteDetailClient({
         </TabsList>
 
         {/* Servicios Tab */}
-        <TabsContent value="servicios" className="mt-4">
+        <TabsContent value="servicios" className="mt-3">
           {servicios.length === 0 ? (
-            <EmptyState
-              icon={<Building2 className="size-6" />}
-              title="Sin servicios"
-              message="Este cliente no tiene servicios registrados."
-            />
+            <p className="py-6 text-center text-xs text-muted-foreground">Sin servicios registrados.</p>
           ) : (
-            <div className="rounded-lg border border-border bg-card shadow-sm overflow-hidden">
-                <table className="w-full text-sm border-collapse">
-                  <thead>
-                    <tr className="border-b border-border bg-muted/50">
-                      <th className="px-3 py-2.5 text-left text-xs font-medium text-muted-foreground">Tipo de Servicio</th>
-                      <th className="px-3 py-2.5 text-left text-xs font-medium text-muted-foreground">Periodo</th>
-                      <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">Honorarios</th>
-                      <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">Cobrado</th>
-                      <th className="px-3 py-2.5 text-right text-xs font-medium text-muted-foreground">Restante</th>
-                      <th className="px-3 py-2.5 text-left text-xs font-medium text-muted-foreground">Estado</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border/50">
-                    {servicios.map((s, i) => {
-                      const badge = COBRANZA_BADGE[s.estadoCobranza];
-                      return (
-                        <tr key={s.id} className={`hover:bg-primary/5 transition-colors ${i % 2 === 0 ? "bg-muted/10" : ""}`}>
-                          <td className="px-3 py-2">
-                            <Link href={`/servicios/${s.id}`} className="font-medium text-sm hover:text-primary transition-colors">{s.tipoServicio.nombre}</Link>
-                          </td>
-                          <td className="px-3 py-2 font-mono text-xs text-muted-foreground">{s.periodo ?? "—"}</td>
-                          <td className="px-3 py-2 text-right font-mono text-xs">{formatCurrency(s.precioFinal)}</td>
-                          <td className="px-3 py-2 text-right font-mono text-xs text-green-600">{formatCurrency(s.montoCobrado)}</td>
-                          <td className="px-3 py-2 text-right font-mono text-xs text-destructive">{formatCurrency(s.montoRestante)}</td>
-                          <td className="px-3 py-2"><Badge className={`text-[10px] ${badge.className}`}>{badge.label}</Badge></td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+            <div className="rounded-lg border border-border overflow-hidden">
+              <table className="w-full text-xs border-collapse" style={{ tableLayout: "fixed" }}>
+                <colgroup><col style={{ width: "24%" }} /><col style={{ width: "13%" }} /><col style={{ width: "16%" }} /><col style={{ width: "16%" }} /><col style={{ width: "16%" }} /><col style={{ width: "15%" }} /></colgroup>
+                <thead>
+                  <tr className="border-b border-border bg-muted/50">
+                    <th className="px-2.5 py-2 text-left text-[10px] uppercase tracking-wider font-medium text-muted-foreground">Servicio</th>
+                    <th className="px-2.5 py-2 text-left text-[10px] uppercase tracking-wider font-medium text-muted-foreground">Periodo</th>
+                    <th className="px-2.5 py-2 text-right text-[10px] uppercase tracking-wider font-medium text-muted-foreground">Honorarios</th>
+                    <th className="px-2.5 py-2 text-right text-[10px] uppercase tracking-wider font-medium text-muted-foreground">Cobrado</th>
+                    <th className="px-2.5 py-2 text-right text-[10px] uppercase tracking-wider font-medium text-muted-foreground">Restante</th>
+                    <th className="px-2.5 py-2 text-center text-[10px] uppercase tracking-wider font-medium text-muted-foreground">Estado</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/50">
+                  {servicios.map((s, i) => {
+                    const badge = COBRANZA_BADGE[s.estadoCobranza];
+                    return (
+                      <tr key={s.id} onClick={() => openServicio(s.id)} className={`transition-colors hover:bg-primary/5 cursor-pointer ${i % 2 === 0 ? "bg-muted/10" : ""}`}>
+                        <td className="px-2.5 py-1.5 font-medium truncate">{s.tipoServicio.nombre}</td>
+                        <td className="px-2.5 py-1.5 font-mono text-muted-foreground">{s.periodo ?? "—"}</td>
+                        <td className="px-2.5 py-1.5 text-right font-mono tabular-nums">{formatCurrency(s.precioFinal)}</td>
+                        <td className="px-2.5 py-1.5 text-right font-mono tabular-nums font-semibold text-emerald-700 dark:text-emerald-400">{formatCurrency(s.montoCobrado)}</td>
+                        <td className="px-2.5 py-1.5 text-right font-mono tabular-nums text-destructive">{formatCurrency(s.montoRestante)}</td>
+                        <td className="px-2.5 py-1.5 text-center"><Badge className={`text-[9px] ${badge.className}`}>{badge.label}</Badge></td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           )}
         </TabsContent>
 
         {/* Incidencias Tab */}
-        <TabsContent value="incidencias" className="mt-4">
+        <TabsContent value="incidencias" className="mt-3">
           {incidencias.length === 0 ? (
-            <EmptyState
-              icon={<AlertCircle className="size-6" />}
-              title="Sin incidencias"
-              message="Este cliente no tiene incidencias registradas."
-            />
+            <p className="py-6 text-center text-xs text-muted-foreground">Sin incidencias registradas.</p>
           ) : (
-            <Card>
-              <CardContent className="divide-y divide-border/50 p-0">
-                {incidencias.map((inc) => {
-                  const prioBadge = PRIORIDAD_BADGE[inc.prioridad];
-                  const estadoBadge = INCIDENCIA_ESTADO_BADGE[inc.estado];
-                  return (
-                    <Link
-                      key={inc.id}
-                      href={`/incidencias/${inc.id}`}
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-muted/40 transition-colors"
-                    >
-                      <Badge className={prioBadge.className}>
-                        {prioBadge.label}
-                      </Badge>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium">{inc.titulo}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {formatDate(inc.createdAt)}
-                          {inc.periodo ? ` · ${inc.periodo}` : ""}
-                        </p>
-                      </div>
-                      <Badge className={estadoBadge.className}>
-                        {estadoBadge.label}
-                      </Badge>
-                    </Link>
-                  );
-                })}
-              </CardContent>
-            </Card>
+            <div className="rounded-lg border border-border overflow-hidden">
+              <table className="w-full text-xs border-collapse" style={{ tableLayout: "fixed" }}>
+                <colgroup><col style={{ width: "10%" }} /><col style={{ width: "42%" }} /><col style={{ width: "16%" }} /><col style={{ width: "16%" }} /><col style={{ width: "16%" }} /></colgroup>
+                <thead>
+                  <tr className="border-b border-border bg-muted/50">
+                    <th className="px-2.5 py-2 text-center text-[10px] uppercase tracking-wider font-medium text-muted-foreground">Prio</th>
+                    <th className="px-2.5 py-2 text-left text-[10px] uppercase tracking-wider font-medium text-muted-foreground">Título</th>
+                    <th className="px-2.5 py-2 text-left text-[10px] uppercase tracking-wider font-medium text-muted-foreground">Periodo</th>
+                    <th className="px-2.5 py-2 text-left text-[10px] uppercase tracking-wider font-medium text-muted-foreground">Fecha</th>
+                    <th className="px-2.5 py-2 text-center text-[10px] uppercase tracking-wider font-medium text-muted-foreground">Estado</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/50">
+                  {incidencias.map((inc, i) => {
+                    const prioBadge = PRIORIDAD_BADGE[inc.prioridad];
+                    const estadoBadge = INCIDENCIA_ESTADO_BADGE[inc.estado];
+                    return (
+                      <tr key={inc.id} onClick={() => setSelectedIncidenciaId(inc.id)} className={`transition-colors hover:bg-primary/5 cursor-pointer ${i % 2 === 0 ? "bg-muted/10" : ""}`}>
+                        <td className="px-2.5 py-1.5 text-center"><Badge className={`text-[9px] ${prioBadge.className}`}>{prioBadge.label}</Badge></td>
+                        <td className="px-2.5 py-1.5 font-medium truncate">{inc.titulo}</td>
+                        <td className="px-2.5 py-1.5 font-mono text-muted-foreground">{inc.periodo ?? "—"}</td>
+                        <td className="px-2.5 py-1.5 font-mono text-muted-foreground">{formatDate(inc.createdAt)}</td>
+                        <td className="px-2.5 py-1.5 text-center"><Badge className={`text-[9px] ${estadoBadge.className}`}>{estadoBadge.label}</Badge></td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           )}
         </TabsContent>
 
         {/* Libros Tab */}
-        <TabsContent value="libros" className="mt-4">
+        <TabsContent value="libros" className="mt-3">
           {libros.length === 0 ? (
-            <EmptyState
-              icon={<BookOpen className="size-6" />}
-              title="Sin libros"
-              message="Este cliente no tiene libros contables registrados."
-            />
+            <p className="py-6 text-center text-xs text-muted-foreground">Sin libros contables registrados.</p>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {Array.from(new Set(libros.map((l) => l.anio)))
                 .sort((a, b) => b - a)
                 .map((anio) => {
                   const librosAnio = libros.filter((l) => l.anio === anio);
                   return (
-                    <Card key={anio}>
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">
-                          Año {anio}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="p-0">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Tipo de Libro</TableHead>
-                              <TableHead>Mes</TableHead>
-                              <TableHead className="text-center">
-                                Completado
-                              </TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {librosAnio.map((libro) => (
-                              <TableRow key={libro.id}>
-                                <TableCell className="text-sm">
-                                  {libro.tipoLibro}
-                                </TableCell>
-                                <TableCell className="text-sm">
-                                  {MESES[libro.mes] ?? libro.mes}
-                                </TableCell>
-                                <TableCell className="text-center">
+                    <div key={anio}>
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">Año {anio}</p>
+                      <div className="rounded-lg border border-border overflow-hidden">
+                        <table className="w-full text-xs border-collapse" style={{ tableLayout: "fixed" }}>
+                          <colgroup><col style={{ width: "50%" }} /><col style={{ width: "30%" }} /><col style={{ width: "20%" }} /></colgroup>
+                          <thead>
+                            <tr className="border-b border-border bg-muted/50">
+                              <th className="px-2.5 py-2 text-left text-[10px] uppercase tracking-wider font-medium text-muted-foreground">Tipo</th>
+                              <th className="px-2.5 py-2 text-left text-[10px] uppercase tracking-wider font-medium text-muted-foreground">Mes</th>
+                              <th className="px-2.5 py-2 text-center text-[10px] uppercase tracking-wider font-medium text-muted-foreground">Estado</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-border/50">
+                            {librosAnio.map((libro, i) => (
+                              <tr key={libro.id} className={i % 2 === 0 ? "bg-muted/10" : ""}>
+                                <td className="px-2.5 py-1.5 font-medium">{libro.tipoLibro}</td>
+                                <td className="px-2.5 py-1.5 text-muted-foreground">{MESES[libro.mes] ?? libro.mes}</td>
+                                <td className="px-2.5 py-1.5 text-center">
                                   {libro.completado ? (
-                                    <Star className="mx-auto size-4 fill-amber-400 text-amber-400" />
+                                    <CheckCircle2 className="mx-auto size-3.5 text-emerald-500" />
                                   ) : (
-                                    <Star className="mx-auto size-4 text-muted-foreground/30" />
+                                    <XCircle className="mx-auto size-3.5 text-muted-foreground/30" />
                                   )}
-                                </TableCell>
-                              </TableRow>
+                                </td>
+                              </tr>
                             ))}
-                          </TableBody>
-                        </Table>
-                      </CardContent>
-                    </Card>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
                   );
                 })}
             </div>
           )}
         </TabsContent>
       </Tabs>
+      </div>
+
+      {/* Popup servicio */}
+      {selectedServicio && (
+        <ServicioDetailDialog
+          servicio={selectedServicio}
+          cuentas={[]}
+          onClose={() => setSelectedServicio(null)}
+        />
+      )}
+
+      {/* Popup incidencia */}
+      {selectedIncidenciaId && (
+        <IncidenciaDetailDialog
+          incidenciaId={selectedIncidenciaId}
+          onClose={() => setSelectedIncidenciaId(null)}
+        />
+      )}
     </div>
   );
 }

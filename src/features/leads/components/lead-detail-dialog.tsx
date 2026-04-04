@@ -74,10 +74,13 @@ export function LeadDetailDialog({
 
   React.useEffect(() => {
     function handleEsc(e: KeyboardEvent) {
-      if (e.key === "Escape" && !conversionOpen) onClose();
+      if (e.key === "Escape") {
+        e.stopImmediatePropagation();
+        if (!conversionOpen) onClose();
+      }
     }
-    document.addEventListener("keydown", handleEsc);
-    return () => document.removeEventListener("keydown", handleEsc);
+    document.addEventListener("keydown", handleEsc, true);
+    return () => document.removeEventListener("keydown", handleEsc, true);
   }, [onClose, conversionOpen]);
 
   const estado = lead.estado as EstadoLead;
@@ -541,7 +544,7 @@ function InlineSelect({ value, placeholder = "—", options, onSave }: InlineSel
   const current = options.find((o) => o.value === value);
 
   return (
-    <Select value={value || "__none__"} onValueChange={(v) => handleChange(v === "__none__" ? "" : v)}>
+    <Select value={value || "__none__"} onValueChange={(v) => v && handleChange(v === "__none__" ? "" : v)}>
       <SelectTrigger
         className={`h-auto px-2 py-0.5 text-sm border-transparent bg-transparent hover:bg-muted/40 transition-colors w-auto gap-1 font-medium ${saving ? "opacity-60" : ""}`}
       >

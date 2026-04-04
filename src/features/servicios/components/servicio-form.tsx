@@ -117,7 +117,7 @@ export function ServicioForm({
     watch,
     formState: { errors },
   } = useForm<CreateServicioInput>({
-    resolver: zodResolver(createServicioSchema),
+    resolver: zodResolver(createServicioSchema as any),
     defaultValues: {
       baseImponible: 0,
       noGravado: 0,
@@ -201,7 +201,7 @@ export function ServicioForm({
               name="personaId"
               control={control}
               render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange}>
+                <Select value={field.value} onValueChange={(v) => v && field.onChange(v)}>
                   <SelectTrigger className="mt-1 w-full">
                     <SelectValue placeholder="Seleccionar cliente" />
                   </SelectTrigger>
@@ -224,7 +224,7 @@ export function ServicioForm({
               name="tipoServicioId"
               control={control}
               render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange}>
+                <Select value={field.value} onValueChange={(v) => v && field.onChange(v)}>
                   <SelectTrigger className="mt-1 w-full">
                     <SelectValue placeholder="Seleccionar tipo" />
                   </SelectTrigger>
@@ -249,7 +249,7 @@ export function ServicioForm({
               render={({ field }) => (
                 <Select
                   value={field.value}
-                  onValueChange={field.onChange}
+                  onValueChange={(v) => v && field.onChange(v)}
                   disabled={isContador}
                 >
                   <SelectTrigger className="mt-1 w-full">
@@ -272,7 +272,7 @@ export function ServicioForm({
             <>
               <div>
                 <Label>Mes del Periodo</Label>
-                <Select value={periodoMes} onValueChange={(v) => setPeriodoMes(v ?? "")}>
+                <Select value={periodoMes} onValueChange={(v) => setPeriodoMes(v ?? "")} >
                   <SelectTrigger className="mt-1 w-full">
                     <SelectValue placeholder="Mes (opcional)" />
                   </SelectTrigger>
@@ -288,7 +288,7 @@ export function ServicioForm({
 
               <div>
                 <Label>Año del Periodo</Label>
-                <Select value={periodoAnio} onValueChange={(v) => setPeriodoAnio(v ?? "")}>
+                <Select value={periodoAnio} onValueChange={(v) => setPeriodoAnio(v ?? "")} >
                   <SelectTrigger className="mt-1 w-full">
                     <SelectValue placeholder="Año" />
                   </SelectTrigger>

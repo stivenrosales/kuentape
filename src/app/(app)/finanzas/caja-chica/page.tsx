@@ -3,7 +3,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import {
   getCajaChicaMovimientos,
   getCajaChicaSaldo,
-  getCajaChicaBalanceHistory,
+  getCajaChicaBalanceDiario,
 } from "@/features/caja-chica/queries";
 import { CajaChicaClient } from "@/features/caja-chica/components/caja-chica-client";
 
@@ -26,9 +26,9 @@ export default async function CajaChicaPage({
   const anio = sp.anio ? Number(sp.anio) : now.getFullYear();
   const mes = sp.mes ? Number(sp.mes) : now.getMonth() + 1;
 
-  const [saldoActual, balanceHistory, movimientos] = await Promise.all([
+  const [saldoActual, balanceDiario, movimientos] = await Promise.all([
     getCajaChicaSaldo(),
-    getCajaChicaBalanceHistory(anio),
+    getCajaChicaBalanceDiario(anio, mes),
     getCajaChicaMovimientos({ anio, mes }),
   ]);
 
@@ -41,7 +41,7 @@ export default async function CajaChicaPage({
 
       <CajaChicaClient
         saldoActual={saldoActual}
-        balanceHistory={balanceHistory}
+        balanceDiario={balanceDiario}
         movimientos={movimientos as any}
         canEdit={canEdit}
         anio={anio}

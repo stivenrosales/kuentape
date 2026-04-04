@@ -21,7 +21,7 @@ export interface FinanzaRow {
   comprobanteUrl: string | null;
   validado: boolean;
   cuenta: { id: string; nombre: string; banco: string };
-  servicio?: { persona: { razonSocial: string }; tipoServicio: { nombre: string } } | null;
+  servicio?: { persona: { razonSocial: string }; tipoServicio: { nombre: string }; contador: { id: string; nombre: string; apellido: string } } | null;
 }
 
 interface FinanzaTableProps {

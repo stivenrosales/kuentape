@@ -102,7 +102,7 @@ export function IncidenciaForm({
     handleSubmit,
     formState: { errors },
   } = useForm<CreateIncidenciaInput>({
-    resolver: zodResolver(createIncidenciaSchema),
+    resolver: zodResolver(createIncidenciaSchema as any),
     defaultValues: {
       prioridad: "MEDIA",
       estado: "ABIERTA",
@@ -158,7 +158,7 @@ export function IncidenciaForm({
               name="personaId"
               control={control}
               render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange}>
+                <Select value={field.value} onValueChange={(v) => v && field.onChange(v)}>
                   <SelectTrigger className="mt-1 w-full">
                     <SelectValue placeholder="Seleccionar empresa" />
                   </SelectTrigger>
@@ -194,7 +194,7 @@ export function IncidenciaForm({
               name="prioridad"
               control={control}
               render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange}>
+                <Select value={field.value} onValueChange={(v) => v && field.onChange(v)}>
                   <SelectTrigger className="mt-1 w-full">
                     <SelectValue placeholder="Seleccionar prioridad" />
                   </SelectTrigger>
@@ -216,7 +216,7 @@ export function IncidenciaForm({
               name="estado"
               control={control}
               render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange}>
+                <Select value={field.value} onValueChange={(v) => v && field.onChange(v)}>
                   <SelectTrigger className="mt-1 w-full">
                     <SelectValue placeholder="Seleccionar estado" />
                   </SelectTrigger>
@@ -241,7 +241,7 @@ export function IncidenciaForm({
               render={({ field }) => (
                 <Select
                   value={field.value}
-                  onValueChange={field.onChange}
+                  onValueChange={(v) => v && field.onChange(v)}
                   disabled={isContador}
                 >
                   <SelectTrigger className="mt-1 w-full">

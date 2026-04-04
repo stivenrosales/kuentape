@@ -97,13 +97,13 @@ export function PersonaFilters({ isAdmin = false, contadores = [] }: PersonaFilt
           value={searchInput}
           onChange={handleSearch}
           placeholder="Buscar empresa o RUC..."
-          className="h-8 w-[220px] rounded-md border border-input bg-background pl-8 pr-3 text-sm outline-none focus:ring-1 focus:ring-ring placeholder:text-muted-foreground"
+          className="h-9 w-[220px] rounded-lg border border-input bg-card pl-8 pr-3 text-xs outline-none focus:ring-1 focus:ring-ring placeholder:text-muted-foreground"
         />
       </div>
 
       {/* Tipo */}
-      <Select value={tipoPersona} onValueChange={(v) => updateParam("tipoPersona", v)}>
-        <SelectTrigger className="w-[140px]">{tipoLabel}</SelectTrigger>
+      <Select value={tipoPersona} onValueChange={(v) => v && updateParam("tipoPersona", v)}>
+        <SelectTrigger className="w-[150px] bg-card text-xs h-9">{tipoLabel}</SelectTrigger>
         <SelectContent>
           {TIPO_OPTIONS.map((o) => (
             <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
@@ -112,8 +112,8 @@ export function PersonaFilters({ isAdmin = false, contadores = [] }: PersonaFilt
       </Select>
 
       {/* Régimen */}
-      <Select value={regimen} onValueChange={(v) => updateParam("regimen", v)}>
-        <SelectTrigger className="w-[100px]">{regimenLabel}</SelectTrigger>
+      <Select value={regimen} onValueChange={(v) => v && updateParam("regimen", v)}>
+        <SelectTrigger className="w-[110px] bg-card text-xs h-9">{regimenLabel}</SelectTrigger>
         <SelectContent>
           {REGIMEN_OPTIONS.map((o) => (
             <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
@@ -122,8 +122,8 @@ export function PersonaFilters({ isAdmin = false, contadores = [] }: PersonaFilt
       </Select>
 
       {/* Estado */}
-      <Select value={estado} onValueChange={(v) => updateParam("estado", v)}>
-        <SelectTrigger className="w-[100px]">{estadoLabel}</SelectTrigger>
+      <Select value={estado} onValueChange={(v) => v && updateParam("estado", v)}>
+        <SelectTrigger className="w-[110px] bg-card text-xs h-9">{estadoLabel}</SelectTrigger>
         <SelectContent>
           {ESTADO_OPTIONS.map((o) => (
             <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
@@ -133,8 +133,8 @@ export function PersonaFilters({ isAdmin = false, contadores = [] }: PersonaFilt
 
       {/* Contador (admin) */}
       {isAdmin && contadores.length > 0 && (
-        <Select value={contadorId} onValueChange={(v) => updateParam("contadorAsignadoId", v)}>
-          <SelectTrigger className="w-[200px]">{contadorLabel}</SelectTrigger>
+        <Select value={contadorId} onValueChange={(v) => v && updateParam("contadorAsignadoId", v)}>
+          <SelectTrigger className="w-[200px] bg-card text-xs h-9">{contadorLabel}</SelectTrigger>
           <SelectContent>
             <SelectItem value={EMPTY}>Todos los contadores</SelectItem>
             {contadores.map((c) => (

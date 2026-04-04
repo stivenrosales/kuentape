@@ -209,3 +209,16 @@ export async function removeAdjuntoAction(adjuntoId: string) {
   }
   return { success: true };
 }
+
+/** Load incidencia detail for popup */
+export async function getIncidenciaDetailAction(id: string) {
+  await authorizeAction(["GERENCIA", "ADMINISTRADOR", "CONTADOR"]);
+  return prisma.incidencia.findUnique({
+    where: { id },
+    include: {
+      persona: { select: { id: true, razonSocial: true, ruc: true } },
+      contador: { select: { id: true, nombre: true, apellido: true, email: true } },
+      adjuntos: { select: { id: true, fileName: true, fileType: true, fileSize: true, url: true, createdAt: true } },
+    },
+  });
+}

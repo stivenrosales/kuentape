@@ -9,7 +9,6 @@ import {
   UserPlus,
   FileCheck,
   DollarSign,
-  Receipt,
   AlertTriangle,
   BookOpen,
   Users,
@@ -75,12 +74,6 @@ const NAV_ITEMS: NavItem[] = [
     roles: ["GERENCIA", "ADMINISTRADOR"],
   },
   {
-    label: "Cobranzas",
-    href: "/cobranzas",
-    icon: Receipt,
-    roles: ["GERENCIA", "ADMINISTRADOR"],
-  },
-  {
     label: "Incidencias",
     href: "/incidencias",
     icon: AlertTriangle,
@@ -97,12 +90,6 @@ const NAV_ITEMS: NavItem[] = [
     href: "/equipo",
     icon: Users,
     roles: ["GERENCIA"],
-  },
-  {
-    label: "Reportes",
-    href: "/reportes",
-    icon: FileText,
-    roles: ["GERENCIA", "ADMINISTRADOR"],
   },
   {
     label: "Configuración",
@@ -138,22 +125,27 @@ export function AppSidebar({ userName, userEmail, userRole }: AppSidebarProps) {
     <Sidebar collapsible="icon">
       {/* Header */}
       <SidebarHeader className="border-b border-sidebar-border">
-        <div className={cn("flex items-center py-2", isCollapsed ? "justify-center px-0" : "gap-2.5 px-2")}>
+        <div className={cn("flex items-center py-2.5", isCollapsed ? "justify-center px-0" : "gap-3 px-2")}>
           <div
             className={cn(
-              "shrink-0 flex items-center justify-center rounded-md bg-primary",
-              isCollapsed ? "h-7 w-7" : "h-8 w-8"
+              "shrink-0 flex items-center justify-center",
+              isCollapsed ? "h-9 w-9" : "h-11 w-11"
             )}
           >
-            <BookOpen className={cn(isCollapsed ? "h-3.5 w-3.5" : "h-4 w-4", "text-primary-foreground")} />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo-mark.svg"
+              alt="C&A"
+              className="h-full w-full object-contain"
+            />
           </div>
           {!isCollapsed && (
-            <div className="flex flex-col overflow-hidden">
+            <div className="flex flex-col overflow-hidden leading-tight">
               <span className="truncate text-sm font-bold text-sidebar-foreground">
-                Kuenta
+                {"C&A"}
               </span>
               <span className="truncate text-[10px] text-muted-foreground">
-                Estudio Contable
+                Contadores y Asociados
               </span>
             </div>
           )}

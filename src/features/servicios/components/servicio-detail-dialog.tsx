@@ -27,10 +27,10 @@ export function ServicioDetailDialog({ servicio, cuentas, onClose }: DetailDialo
   React.useEffect(() => {
     if (!servicio) return;
     function handleEsc(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") { e.stopImmediatePropagation(); onClose(); }
     }
-    document.addEventListener("keydown", handleEsc);
-    return () => document.removeEventListener("keydown", handleEsc);
+    document.addEventListener("keydown", handleEsc, true);
+    return () => document.removeEventListener("keydown", handleEsc, true);
   }, [servicio, onClose]);
 
   if (!servicio) return null;

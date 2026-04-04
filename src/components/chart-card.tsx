@@ -23,18 +23,17 @@ export function ChartCard({
   return (
     <div
       className={cn(
-        "flex flex-col gap-4 rounded-[1.25rem] bg-card p-5",
-        "shadow-[0_4px_16px_-4px_rgba(0,0,0,0.12),0_2px_8px_-2px_rgba(0,0,0,0.08)]",
-        "ring-1 ring-foreground/10",
+        "flex flex-col gap-3 rounded-lg bg-card px-4 py-3 min-w-0 overflow-hidden",
+        "shadow-sm border border-border",
         className
       )}
     >
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h3 className="text-base font-semibold leading-snug">{title}</h3>
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-col gap-0.5">
+          <h3 className="text-sm font-semibold leading-snug">{title}</h3>
           {description && (
-            <p className="text-sm text-muted-foreground">{description}</p>
+            <p className="text-xs text-muted-foreground">{description}</p>
           )}
         </div>
         {actions && (

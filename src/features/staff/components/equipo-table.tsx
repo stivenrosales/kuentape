@@ -154,13 +154,13 @@ export function EquipoTable({ data, onRowClick }: EquipoTableProps) {
                   router.refresh();
                 }}
               >
-                <td className="px-3 py-2.5 font-medium truncate">
+                <td className="px-3 py-2 text-xs font-medium truncate">
                   {member.nombre} {member.apellido}
                 </td>
-                <td className="px-3 py-2.5 text-xs text-muted-foreground truncate">
+                <td className="px-3 py-2 text-xs text-muted-foreground truncate">
                   {member.email}
                 </td>
-                <td className="px-3 py-2.5">
+                <td className="px-3 py-2">
                   <span
                     className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
                       roleBadgeClass[member.role] ?? ""
@@ -169,7 +169,7 @@ export function EquipoTable({ data, onRowClick }: EquipoTableProps) {
                     {roleLabel[member.role] ?? member.role}
                   </span>
                 </td>
-                <td className="px-3 py-2.5">
+                <td className="px-3 py-2">
                   <div className="flex items-center gap-1.5">
                     <span
                       className={`size-2 rounded-full ${
@@ -181,10 +181,10 @@ export function EquipoTable({ data, onRowClick }: EquipoTableProps) {
                     </span>
                   </div>
                 </td>
-                <td className="px-3 py-2.5 text-sm text-muted-foreground">
+                <td className="px-3 py-2 text-xs text-muted-foreground">
                   {member._count.servicios}
                 </td>
-                <td className="px-3 py-2.5 text-sm text-muted-foreground">
+                <td className="px-3 py-2 text-xs text-muted-foreground">
                   {member._count.personasAsignadas}
                 </td>
               </ContextMenuRow>

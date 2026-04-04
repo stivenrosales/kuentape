@@ -15,7 +15,7 @@ import {
   getServiciosListStats,
 } from "@/features/servicios/queries-list";
 import { ServicioListEnhanced } from "@/features/servicios/components/servicio-list-enhanced";
-import { ServicioListFilters } from "@/features/servicios/components/servicio-list-filters";
+import { ServicioFiltersWithPdf } from "@/features/servicios/components/servicio-filters-with-pdf";
 import { NuevoServicioDialog } from "@/features/servicios/components/nuevo-servicio-dialog";
 
 interface SearchParams {
@@ -63,7 +63,7 @@ export default async function ServiciosPage({
     <div className="space-y-6">
       <PageHeader
         title="Servicios"
-        description={`${stats.totalCount} servicio(s) — ${periodo}`}
+        description={`${stats.totalCount} servicio(s)`}
       >
         <Link
           href="/servicios/archivados"
@@ -81,7 +81,7 @@ export default async function ServiciosPage({
       </PageHeader>
 
       {/* KPI cards — compactas */}
-      <div className="grid grid-cols-5 gap-2">
+      <div className="grid gap-2 grid-cols-2 lg:grid-cols-5">
         <div className="rounded-lg border border-border bg-card px-4 py-3 shadow-sm">
           <div className="flex items-center justify-between">
             <span className="text-xs text-muted-foreground">Servicios</span>
@@ -124,12 +124,14 @@ export default async function ServiciosPage({
         </div>
       </div>
 
-      {/* Filtros */}
-      <ServicioListFilters
+      {/* Filtros + PDF */}
+      <ServicioFiltersWithPdf
         tiposServicio={tiposServicio}
         contadores={canManage ? contadores : undefined}
         isAdmin={canManage}
         periodoDefault={periodoDefault}
+        servicios={servicios as any}
+        periodoLabel={periodo}
       />
 
       {/* Lista principal */}

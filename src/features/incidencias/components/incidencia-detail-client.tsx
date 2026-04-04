@@ -64,7 +64,8 @@ export function IncidenciaDetailClient({ incidencia, canEdit }: IncidenciaDetail
   const [estado, setEstado] = React.useState<EstadoIncidencia>(incidencia.estado);
   const [saving, setSaving] = React.useState(false);
 
-  async function handleEstadoChange(v: string) {
+  async function handleEstadoChange(v: string | null) {
+    if (!v) return;
     const nuevoEstado = v as EstadoIncidencia;
     setEstado(nuevoEstado);
     setSaving(true);

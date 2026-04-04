@@ -98,7 +98,7 @@ function ServicioFormDialog({
     } as any);
 
     if (result && "error" in result) {
-      toast.error(typeof result.error === "string" ? result.error : "Error al crear");
+      toast.error(typeof (result as any).error === "string" ? (result as any).error : "Error al crear");
     } else {
       toast.success("Servicio creado");
       onSuccess();
@@ -132,7 +132,7 @@ function ServicioFormDialog({
             </div>
             <div>
               <label className={labelClass}>Tipo de Servicio *</label>
-              <Select value={tipoServicioId} onValueChange={setTipoServicioId}>
+              <Select value={tipoServicioId} onValueChange={(v) => v && setTipoServicioId(v)}>
                 <SelectTrigger className="h-8 text-sm">{selectedTipo?.nombre ?? "Seleccionar..."}</SelectTrigger>
                 <SelectContent>
                   {tiposServicio.map((t) => <SelectItem key={t.id} value={t.id}>{t.nombre}</SelectItem>)}
@@ -144,7 +144,7 @@ function ServicioFormDialog({
               <>
                 <div>
                   <label className={labelClass}>Mes</label>
-                  <Select value={periodoMes} onValueChange={setPeriodoMes}>
+                  <Select value={periodoMes} onValueChange={(v) => v && setPeriodoMes(v)}>
                     <SelectTrigger className="h-8 text-sm">{MESES[parseInt(periodoMes) - 1] ?? "Mes"}</SelectTrigger>
                     <SelectContent>
                       {MESES.map((m, i) => <SelectItem key={i} value={String(i + 1).padStart(2, "0")}>{m}</SelectItem>)}
@@ -153,7 +153,7 @@ function ServicioFormDialog({
                 </div>
                 <div>
                   <label className={labelClass}>Año</label>
-                  <Select value={periodoAnio} onValueChange={setPeriodoAnio}>
+                  <Select value={periodoAnio} onValueChange={(v) => v && setPeriodoAnio(v)}>
                     <SelectTrigger className="h-8 text-sm">{periodoAnio}</SelectTrigger>
                     <SelectContent>
                       {["2024","2025","2026","2027"].map((y) => <SelectItem key={y} value={y}>{y}</SelectItem>)}

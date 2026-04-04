@@ -370,17 +370,19 @@ model Finanza {
 }
 
 model CajaChica {
-  id             String        @id @default(cuid())
-  tipo           TipoCajaChica
-  monto          Int
-  fecha          DateTime
-  concepto       String
-  comprobanteUrl String?       @map("comprobante_url")
-  saldoAcumulado Int           @map("saldo_acumulado")
-  creadoPorId    String        @map("creado_por_id")
-  creadoPor      User          @relation("CajaChicaCreador", fields: [creadoPorId], references: [id])
-  createdAt      DateTime      @default(now()) @map("created_at")
-  updatedAt      DateTime      @updatedAt @map("updated_at")
+  id               String        @id @default(cuid())
+  tipo             TipoCajaChica
+  monto            Int
+  fecha            DateTime
+  concepto         String
+  categoriaGasto   String?       @map("categoria_gasto")
+  comprobanteUrl   String?       @map("comprobante_url")
+  saldoAcumulado   Int           @map("saldo_acumulado")
+  finanzaVinculada String?       @unique @map("finanza_vinculada_id")
+  creadoPorId      String        @map("creado_por_id")
+  creadoPor        User          @relation("CajaChicaCreador", fields: [creadoPorId], references: [id])
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
 
   @@index([fecha])
   @@map("caja_chica")

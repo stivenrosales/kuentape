@@ -53,13 +53,13 @@ export function GenerarLibrosButton() {
 
   return (
     <div className="flex items-center gap-2">
-      <Select value={mes} onValueChange={setMes}>
+      <Select value={mes} onValueChange={(v) => v && setMes(v)}>
         <SelectTrigger className="h-8 w-[120px] text-xs">{MESES[parseInt(mes) - 1]}</SelectTrigger>
         <SelectContent>
           {MESES.map((m, i) => <SelectItem key={i} value={String(i + 1)}>{m}</SelectItem>)}
         </SelectContent>
       </Select>
-      <Select value={anio} onValueChange={setAnio}>
+      <Select value={anio} onValueChange={(v) => v && setAnio(v)}>
         <SelectTrigger className="h-8 w-[80px] text-xs">{anio}</SelectTrigger>
         <SelectContent>
           {["2025", "2026", "2027"].map((y) => <SelectItem key={y} value={y}>{y}</SelectItem>)}

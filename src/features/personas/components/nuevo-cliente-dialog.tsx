@@ -75,7 +75,7 @@ function ClienteFormDialog({
     } as any);
 
     if (result && "error" in result) {
-      const msg = typeof result.error === "string" ? result.error : Object.values(result.error as any).flat().join(", ");
+      const msg = typeof (result as any).error === "string" ? (result as any).error : Object.values((result as any).error as any).flat().join(", ");
       toast.error(msg);
     } else {
       toast.success("Cliente creado");
@@ -122,7 +122,7 @@ function ClienteFormDialog({
             </div>
             <div>
               <label className={labelClass}>Tipo *</label>
-              <Select value={tipoPersona} onValueChange={setTipoPersona}>
+              <Select value={tipoPersona} onValueChange={(v) => v && setTipoPersona(v)}>
                 <SelectTrigger className="h-8 text-sm">{TIPO_OPTIONS.find(o => o.value === tipoPersona)?.label}</SelectTrigger>
                 <SelectContent>
                   {TIPO_OPTIONS.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
@@ -131,7 +131,7 @@ function ClienteFormDialog({
             </div>
             <div>
               <label className={labelClass}>Régimen *</label>
-              <Select value={regimen} onValueChange={setRegimen}>
+              <Select value={regimen} onValueChange={(v) => v && setRegimen(v)}>
                 <SelectTrigger className="h-8 text-sm">{REGIMEN_OPTIONS.find(o => o.value === regimen)?.label}</SelectTrigger>
                 <SelectContent>
                   {REGIMEN_OPTIONS.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}

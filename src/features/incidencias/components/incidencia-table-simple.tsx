@@ -8,6 +8,7 @@ import { formatDate } from "@/lib/format";
 import type { Prioridad, EstadoIncidencia } from "@prisma/client";
 import { ContextMenuRow } from "@/components/context-menu-row";
 import { updateIncidenciaEstadoAction } from "@/features/incidencias/actions";
+import { IncidenciaDetailDialog } from "./incidencia-detail-dialog";
 import { cn } from "@/lib/utils";
 
 export interface IncidenciaSimpleRow {
@@ -107,6 +108,7 @@ function SortableHeader({
 }
 
 export function IncidenciaTableSimple({ data }: IncidenciaTableSimpleProps) {
+  const [selectedId, setSelectedId] = React.useState<string | null>(null);
   const router = useRouter();
 
   const [sortKey, setSortKey] = React.useState<SortKey>("fecha");
@@ -143,6 +145,7 @@ export function IncidenciaTableSimple({ data }: IncidenciaTableSimpleProps) {
   const sorted = sortItems(data);
 
   return (
+    <>
     <div className="rounded-lg border border-border bg-card shadow-sm overflow-hidden">
       <table className="w-full border-collapse" style={{ tableLayout: "fixed" }}>
         <colgroup>
@@ -174,7 +177,7 @@ export function IncidenciaTableSimple({ data }: IncidenciaTableSimpleProps) {
             sorted.map((row, i) => (
               <ContextMenuRow
                 key={row.id}
-                onClick={() => router.push(`/incidencias/${row.id}`)}
+                onClick={() => setSelectedId(row.id)}
                 className={`cursor-pointer transition-colors hover:bg-primary/5 ${
                   i % 2 === 0 ? "bg-muted/10" : "bg-background"
                 }`}
@@ -213,5 +216,13 @@ export function IncidenciaTableSimple({ data }: IncidenciaTableSimpleProps) {
         </tbody>
       </table>
     </div>
+
+    {selectedId && (
+      <IncidenciaDetailDialog
+        incidenciaId={selectedId}
+        onClose={() => setSelectedId(null)}
+      />
+    )}
+    </>
   );
 }

@@ -15,35 +15,57 @@ export async function getCobranzasPorContador(
 ) {
   const periodo = toPeriodo(anio, mes);
 
+  // Servicios del mes actual
   const servicios = await prisma.servicio.groupBy({
     by: ["contadorId"],
     where: { periodo, ...(contadorId ? { contadorId } : {}) },
     _sum: { honorarios: true, montoCobrado: true, montoRestante: true },
   });
 
-  if (servicios.length === 0) return [];
+  // Rezago: deuda de meses ANTERIORES al seleccionado
+  const rezagoData = await prisma.servicio.groupBy({
+    by: ["contadorId"],
+    where: {
+      periodo: { lt: periodo },
+      estadoCobranza: { in: ["PENDIENTE", "PARCIAL"] },
+      montoRestante: { gt: 0 },
+      ...(contadorId ? { contadorId } : {}),
+    },
+    _sum: { montoRestante: true },
+  });
+  const rezagoMap = new Map(rezagoData.map((r) => [r.contadorId, r._sum.montoRestante ?? 0]));
 
-  const userIds = servicios.map((s) => s.contadorId);
+  // Collect all contador IDs (from both current month and rezago)
+  const allContadorIds = new Set([
+    ...servicios.map((s) => s.contadorId),
+    ...rezagoData.map((r) => r.contadorId),
+  ]);
+
+  if (allContadorIds.size === 0) return [];
+
   const users = await prisma.user.findMany({
-    where: { id: { in: userIds } },
+    where: { id: { in: Array.from(allContadorIds) } },
     select: { id: true, nombre: true, apellido: true },
   });
   const userMap = Object.fromEntries(users.map((u) => [u.id, u]));
+  const serviciosMap = new Map(servicios.map((s) => [s.contadorId, s]));
 
-  return servicios
-    .map((s) => {
-      const u = userMap[s.contadorId];
-      const honorarios = s._sum.honorarios ?? 0;
-      const cobrado = s._sum.montoCobrado ?? 0;
-      const deuda = s._sum.montoRestante ?? 0;
-      const porcentaje =
-        honorarios > 0 ? Math.round((cobrado / honorarios) * 100) : 0;
+  return Array.from(allContadorIds)
+    .map((contId) => {
+      const u = userMap[contId];
+      const s = serviciosMap.get(contId);
+      const honorarios = s?._sum.honorarios ?? 0;
+      const cobrado = s?._sum.montoCobrado ?? 0;
+      const deuda = s?._sum.montoRestante ?? 0;
+      const rezago = rezagoMap.get(contId) ?? 0;
+      const porcentaje = honorarios > 0 ? Math.round((cobrado / honorarios) * 100) : 0;
       return {
-        contadorId: s.contadorId,
-        contador: u ? `${u.nombre} ${u.apellido}` : s.contadorId,
+        contadorId: contId,
+        contador: u ? `${u.nombre} ${u.apellido}` : contId,
         honorarios,
         cobrado,
         deuda,
+        rezago,
         porcentaje,
       };
     })

@@ -70,7 +70,7 @@ export function RegistrarCobroDialog({
     reset,
     formState: { errors },
   } = useForm<RegistrarCobroInput>({
-    resolver: zodResolver(registrarCobroSchema),
+    resolver: zodResolver(registrarCobroSchema as any),
     defaultValues: {
       monto: montoRestante,
       fecha: new Date(),
@@ -164,7 +164,7 @@ export function RegistrarCobroDialog({
               name="cuentaId"
               control={control}
               render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange}>
+                <Select value={field.value} onValueChange={(v) => v && field.onChange(v)}>
                   <SelectTrigger className="mt-1 w-full">
                     <SelectValue placeholder="Seleccionar cuenta" />
                   </SelectTrigger>

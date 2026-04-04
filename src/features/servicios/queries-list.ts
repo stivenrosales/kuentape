@@ -2,9 +2,9 @@ import { prisma } from "@/lib/prisma";
 import { requireAuth, scopedWhere } from "@/lib/auth-guard";
 
 export interface ListFilters {
-  periodo: string; // "2026-03"
-  tipoServicioId?: string;
-  contadorId?: string;
+  periodo: string; // "2026-03" or comma-separated "2026-03,2026-04"
+  tipoServicioId?: string; // single or comma-separated
+  contadorId?: string; // single or comma-separated
   search?: string;
 }
 
@@ -24,14 +24,14 @@ export interface ServicioListItem {
   estadoTrabajo: string;
   estado: string;
   notas: string | null;
-  persona: { id: string; razonSocial: string; tipoPersona: string; regimen: string };
+  persona: { id: string; razonSocial: string; tipoPersona: string; regimen: string; numTrabajadores: number | null };
   tipoServicio: { id: string; nombre: string; categoria: string };
   contador: { id: string; nombre: string; apellido: string };
 }
 
 const listInclude = {
   persona: {
-    select: { id: true, razonSocial: true, tipoPersona: true, regimen: true },
+    select: { id: true, razonSocial: true, tipoPersona: true, regimen: true, numTrabajadores: true },
   },
   tipoServicio: {
     select: { id: true, nombre: true, categoria: true },
@@ -41,19 +41,25 @@ const listInclude = {
   },
 };
 
+function toArray(val?: string): string[] {
+  if (!val) return [];
+  return val.split(",").map((s) => s.trim()).filter(Boolean);
+}
+
 function buildListWhere(filters: ListFilters, role: string, userId: string) {
+  const periodos = toArray(filters.periodo);
   const baseWhere: Record<string, any> = {
-    periodo: filters.periodo,
+    periodo: periodos.length > 1 ? { in: periodos } : periodos[0],
     estado: { not: "ARCHIVADO" as const },
   };
 
-  if (filters.tipoServicioId) {
-    baseWhere.tipoServicioId = filters.tipoServicioId;
-  }
+  const tipoIds = toArray(filters.tipoServicioId);
+  if (tipoIds.length === 1) baseWhere.tipoServicioId = tipoIds[0];
+  else if (tipoIds.length > 1) baseWhere.tipoServicioId = { in: tipoIds };
 
-  if (filters.contadorId) {
-    baseWhere.contadorId = filters.contadorId;
-  }
+  const contadorIds = toArray(filters.contadorId);
+  if (contadorIds.length === 1) baseWhere.contadorId = contadorIds[0];
+  else if (contadorIds.length > 1) baseWhere.contadorId = { in: contadorIds };
 
   if (filters.search) {
     baseWhere.persona = {

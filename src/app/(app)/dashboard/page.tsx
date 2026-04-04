@@ -345,7 +345,7 @@ async function DashboardContador({
       </div>
 
       {/* Incidencias abiertas */}
-      <div className="flex items-center gap-4 rounded-[1.25rem] bg-card p-5 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.12)] ring-1 ring-foreground/10">
+      <div className="flex items-center gap-4 rounded-lg border border-border bg-card shadow-sm p-4">
         <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-destructive/10 text-destructive">
           <AlertCircle className="size-5" />
         </div>
@@ -398,7 +398,7 @@ async function DashboardVentas({
         {pipeline.map((p) => (
           <div
             key={p.estado}
-            className="flex flex-col gap-2 rounded-[1.25rem] bg-card p-5 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.12)] ring-1 ring-foreground/10"
+            className="flex flex-col gap-2 rounded-lg border border-border bg-card shadow-sm p-4"
           >
             <p className="text-sm text-muted-foreground">{p.label}</p>
             <p className="text-3xl font-semibold">
@@ -412,7 +412,7 @@ async function DashboardVentas({
       </div>
 
       {/* Leads recientes */}
-      <div className="rounded-[1.25rem] bg-card p-5 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.12)] ring-1 ring-foreground/10">
+      <div className="rounded-lg border border-border bg-card shadow-sm p-4">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-base font-semibold">Mis leads recientes</h2>
           <Link href="/prospectos" className="text-xs text-muted-foreground hover:text-primary transition-colors">
@@ -454,11 +454,11 @@ async function DashboardVentas({
       </div>
 
       {/* Quick action */}
-      <div className="rounded-[1.25rem] bg-card p-5 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.12)] ring-1 ring-foreground/10">
+      <div className="rounded-lg border border-border bg-card shadow-sm p-4">
         <h2 className="mb-4 text-base font-semibold">Acciones rápidas</h2>
         <div className="flex flex-wrap gap-2">
-          <Link href="/prospectos/nuevo" className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors">
-            Nuevo prospecto
+          <Link href="/prospectos" className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors">
+            Ver prospectos
           </Link>
         </div>
       </div>

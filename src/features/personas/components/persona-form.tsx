@@ -84,7 +84,7 @@ export function PersonaForm({
     handleSubmit,
     formState: { errors },
   } = useForm<CreatePersonaInput>({
-    resolver: zodResolver(createPersonaSchema),
+    resolver: zodResolver(createPersonaSchema as any),
     defaultValues: {
       tipoPersona: "JURIDICA",
       regimen: "MYPE",
@@ -100,7 +100,7 @@ export function PersonaForm({
     handleSubmit: handleCredSubmit,
     formState: { errors: credErrors },
   } = useForm<UpdateCredentialsInput>({
-    resolver: zodResolver(updateCredentialsSchema),
+    resolver: zodResolver(updateCredentialsSchema as any),
     defaultValues: {
       claveSolUsuario: "",
       claveSolClave: "",
@@ -187,7 +187,7 @@ export function PersonaForm({
                 name="tipoPersona"
                 control={control}
                 render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  <Select value={field.value} onValueChange={(v) => v && field.onChange(v)}>
                     <SelectTrigger className="mt-1 w-full">
                       <SelectValue placeholder="Seleccionar tipo" />
                     </SelectTrigger>
@@ -210,7 +210,7 @@ export function PersonaForm({
                 name="regimen"
                 control={control}
                 render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  <Select value={field.value} onValueChange={(v) => v && field.onChange(v)}>
                     <SelectTrigger className="mt-1 w-full">
                       <SelectValue placeholder="Seleccionar régimen" />
                     </SelectTrigger>
@@ -301,7 +301,7 @@ export function PersonaForm({
                 name="contadorAsignadoId"
                 control={control}
                 render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  <Select value={field.value} onValueChange={(v) => v && field.onChange(v)}>
                     <SelectTrigger className="mt-1 w-full">
                       <SelectValue placeholder="Seleccionar contador" />
                     </SelectTrigger>
@@ -324,7 +324,7 @@ export function PersonaForm({
                 name="tipoContabilidad"
                 control={control}
                 render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  <Select value={field.value} onValueChange={(v) => v && field.onChange(v)}>
                     <SelectTrigger className="mt-1 w-full">
                       <SelectValue placeholder="Seleccionar tipo" />
                     </SelectTrigger>

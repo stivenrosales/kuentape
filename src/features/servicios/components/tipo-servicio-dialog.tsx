@@ -69,7 +69,7 @@ export function TipoServicioDialog({
     reset,
     formState: { errors },
   } = useForm<CreateTipoServicioInput>({
-    resolver: zodResolver(createTipoServicioSchema),
+    resolver: zodResolver(createTipoServicioSchema as any),
     defaultValues: {
       nombre: "",
       categoria: "MENSUAL",
@@ -153,7 +153,7 @@ export function TipoServicioDialog({
               name="categoria"
               control={control}
               render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange}>
+                <Select value={field.value} onValueChange={(v) => v && field.onChange(v)}>
                   <SelectTrigger className="mt-1 w-full">
                     <SelectValue placeholder="Seleccionar categoría" />
                   </SelectTrigger>

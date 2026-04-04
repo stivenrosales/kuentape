@@ -243,7 +243,7 @@ function NuevoLeadFormDialog({
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className={labelClass}>Régimen</label>
-                <Select value={regimen} onValueChange={setRegimen}>
+                <Select value={regimen} onValueChange={(v) => v && setRegimen(v)}>
                   <SelectTrigger className="h-8 text-sm">
                     {regimen
                       ? REGIMEN_OPTIONS.find((r) => r.value === regimen)?.label
@@ -261,7 +261,7 @@ function NuevoLeadFormDialog({
 
               <div>
                 <label className={labelClass}>Rubro</label>
-                <Select value={rubro} onValueChange={setRubro}>
+                <Select value={rubro} onValueChange={(v) => v && setRubro(v)}>
                   <SelectTrigger className="h-8 text-sm">
                     {rubro || "Seleccionar..."}
                   </SelectTrigger>
@@ -289,7 +289,7 @@ function NuevoLeadFormDialog({
 
               <div>
                 <label className={labelClass}>Asignado a</label>
-                <Select value={asignadoAId} onValueChange={setAsignadoAId}>
+                <Select value={asignadoAId} onValueChange={(v) => v && setAsignadoAId(v)}>
                   <SelectTrigger className="h-8 text-sm">
                     {asignadoAId
                       ? (() => {

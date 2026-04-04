@@ -45,9 +45,9 @@ export default async function ServiciosArchivadosPage({
         title="Servicios Archivados"
         description={`${total} servicio(s) archivado(s)`}
       >
-        <Button variant="outline" render={<Link href="/servicios" />}>
+        <Link href="/servicios" className="inline-flex items-center rounded-lg border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors">
           Volver a Servicios
-        </Button>
+        </Link>
       </PageHeader>
 
       {servicios.length === 0 ? (

@@ -49,8 +49,8 @@ function CustomTooltip({ active, payload, label, formatValue, bars }: CustomTool
   if (!active || !payload || payload.length === 0) return null;
 
   return (
-    <div className="rounded-xl border border-border/60 bg-popover px-3 py-2 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.12)] text-sm">
-      <p className="mb-1.5 font-medium text-foreground">{label}</p>
+    <div className="rounded-lg border border-border/60 bg-popover px-3 py-2 shadow-md text-xs">
+      <p className="mb-1 font-semibold text-foreground">{label}</p>
       {payload.map((entry) => {
         const barDef = bars.find((b) => b.key === entry.name);
         return (
@@ -96,13 +96,13 @@ export function BarChart({
           />
           <XAxis
             dataKey={xKey}
-            tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
+            tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
             axisLine={false}
             tickLine={false}
-            dy={8}
+            dy={6}
           />
           <YAxis
-            tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
+            tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
             axisLine={false}
             tickLine={false}
             tickFormatter={formatValue}

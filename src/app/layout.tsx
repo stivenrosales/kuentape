@@ -20,7 +20,7 @@ const fontMono = Roboto_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Kuenta Estudio Contable",
+  title: "C&A — Contadores y Asociados",
   description: "Sistema de gestión contable",
 };
 

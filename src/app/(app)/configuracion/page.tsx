@@ -1,6 +1,7 @@
 import { requireRole } from "@/lib/auth-guard";
 import Link from "next/link";
 import { FileCheck, Landmark, Settings } from "lucide-react";
+import { PageHeader } from "@/components/layout/page-header";
 
 export default async function ConfiguracionPage() {
   await requireRole(["GERENCIA"]);
@@ -21,13 +22,8 @@ export default async function ConfiguracionPage() {
   ];
 
   return (
-    <div className="space-y-6 p-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Configuración</h1>
-        <p className="text-muted-foreground">
-          Administrar las opciones del sistema
-        </p>
-      </div>
+    <div className="space-y-6">
+      <PageHeader title="Configuración" description="Administrar las opciones del sistema" />
 
       <div className="grid gap-4 md:grid-cols-2">
         {sections.map((section) => {

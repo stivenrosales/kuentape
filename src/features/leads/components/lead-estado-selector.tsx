@@ -60,7 +60,7 @@ export function LeadEstadoSelector({
         <Label>Estado actual</Label>
         <Select
           value={currentEstado}
-          onValueChange={handleChange}
+          onValueChange={(v) => { if (!v) return; handleChange(v); }}
           disabled={loading || currentEstado === "CONVERTIDO"}
         >
           <SelectTrigger className="w-full">

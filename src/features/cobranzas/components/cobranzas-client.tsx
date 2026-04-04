@@ -187,7 +187,7 @@ function MontoRestanteFilters({
     <div className="flex flex-wrap items-center gap-2">
       <Select
         value={tipoServicioId}
-        onValueChange={(v) => update("tipoServicioId", v === "_all" ? "" : v)}
+        onValueChange={(v) => v && update("tipoServicioId", v === "_all" ? "" : v)}
       >
         <SelectTrigger className="w-44">
           <SelectValue placeholder="Tipo de Servicio" />
@@ -204,7 +204,7 @@ function MontoRestanteFilters({
 
       <Select
         value={tipoPersona}
-        onValueChange={(v) => update("tipoPersona", v === "_all" ? "" : v)}
+        onValueChange={(v) => v && update("tipoPersona", v === "_all" ? "" : v)}
       >
         <SelectTrigger className="w-36">
           <SelectValue placeholder="Tipo de Persona" />
@@ -221,7 +221,7 @@ function MontoRestanteFilters({
 
       <Select
         value={filterMes}
-        onValueChange={(v) => update("filterMes", v === "_all" ? "" : v)}
+        onValueChange={(v) => v && update("filterMes", v === "_all" ? "" : v)}
       >
         <SelectTrigger className="w-36">
           <SelectValue placeholder="Mes" />

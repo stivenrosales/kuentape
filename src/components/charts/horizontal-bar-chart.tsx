@@ -71,11 +71,11 @@ export function HorizontalBarChart({
         <BarChart
           layout="vertical"
           data={sorted}
-          margin={{ top: 4, right: 80, left: 8, bottom: 4 }}
+          margin={{ top: 4, right: 70, left: 4, bottom: 4 }}
         >
           <XAxis
             type="number"
-            tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+            tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
             axisLine={false}
             tickLine={false}
             tickFormatter={formatValue}
@@ -83,8 +83,8 @@ export function HorizontalBarChart({
           <YAxis
             type="category"
             dataKey={nameKey}
-            width={120}
-            tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
+            width={100}
+            tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
             axisLine={false}
             tickLine={false}
           />
@@ -96,7 +96,7 @@ export function HorizontalBarChart({
             <LabelList
               dataKey={valueKey}
               position="right"
-              formatter={(v: number) => (formatValue ? formatValue(v) : v)}
+              formatter={(v: unknown) => (formatValue ? formatValue(v as number) : String(v))}
               style={{ fontSize: 11, fill: "var(--muted-foreground)" }}
             />
           </Bar>

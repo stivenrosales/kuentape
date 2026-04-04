@@ -91,7 +91,7 @@ function IncidenciaFormDialog({
 
     const result = await createIncidenciaAction(formData as any);
     if (result && "error" in result) {
-      toast.error(typeof result.error === "string" ? result.error : "Error al crear");
+      toast.error(typeof (result as any).error === "string" ? (result as any).error : "Error al crear");
     } else {
       toast.success("Incidencia creada");
       onSuccess();
@@ -128,7 +128,7 @@ function IncidenciaFormDialog({
             </div>
             <div>
               <label className={labelClass}>Prioridad</label>
-              <Select value={prioridad} onValueChange={setPrioridad}>
+              <Select value={prioridad} onValueChange={(v) => v && setPrioridad(v)}>
                 <SelectTrigger className="h-8 text-sm">{prioridad === "ALTA" ? "Alta" : prioridad === "MEDIA" ? "Media" : "Baja"}</SelectTrigger>
                 <SelectContent>
                   <SelectItem value="BAJA">Baja</SelectItem>

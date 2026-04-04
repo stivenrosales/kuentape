@@ -8,6 +8,14 @@ export function formatCurrency(centavos: number): string {
   return currencyFormatter.format(centavos / 100);
 }
 
+/** Formato corto para ejes de gráficos: S/1.5K, S/18K, S/1.2M */
+export function formatCurrencyShort(centavos: number): string {
+  const value = centavos / 100;
+  if (value >= 1_000_000) return `S/${(value / 1_000_000).toFixed(1)}M`;
+  if (value >= 1_000) return `S/${(value / 1_000).toFixed(value >= 10_000 ? 0 : 1)}K`;
+  return `S/${value.toFixed(0)}`;
+}
+
 export function formatDate(date: Date | string): string {
   const d = typeof date === "string" ? new Date(date) : date;
   return d.toLocaleDateString("es-PE", {

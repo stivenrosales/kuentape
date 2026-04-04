@@ -75,7 +75,7 @@ export function LeadConversionDialog({
     reset,
     formState: { errors, isSubmitting },
   } = useForm<ConvertLeadInput>({
-    resolver: zodResolver(convertLeadSchema),
+    resolver: zodResolver(convertLeadSchema as any),
     defaultValues: {
       tipoPersona: "JURIDICA",
       regimen: lead.regimen ?? undefined,
@@ -104,10 +104,10 @@ export function LeadConversionDialog({
       tipoPersona: tipoPersona!,
     });
 
-    if (result.error) {
+    if ((result as any).error) {
       toast.error(
-        typeof result.error === "string"
-          ? result.error
+        typeof (result as any).error === "string"
+          ? (result as any).error
           : "Error al convertir el prospecto"
       );
       return;
@@ -251,7 +251,7 @@ export function LeadConversionDialog({
                   control={control}
                   name="regimen"
                   render={({ field }) => (
-                    <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                    <Select value={field.value ?? ""} onValueChange={(v) => v && field.onChange(v)}>
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Seleccionar régimen..." />
                       </SelectTrigger>
@@ -276,7 +276,7 @@ export function LeadConversionDialog({
                   control={control}
                   name="contadorAsignadoId"
                   render={({ field }) => (
-                    <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                    <Select value={field.value ?? ""} onValueChange={(v) => v && field.onChange(v)}>
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Seleccionar contador..." />
                       </SelectTrigger>
@@ -328,9 +328,9 @@ export function LeadConversionDialog({
                 Cerrar
               </Button>
               {newPersonaId && (
-                <Button render={<Link href={`/clientes/${newPersonaId}`} />}>
+                <Link href={`/clientes/${newPersonaId}`} className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
                   Ver cliente
-                </Button>
+                </Link>
               )}
             </div>
           </div>

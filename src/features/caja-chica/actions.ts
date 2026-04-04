@@ -19,7 +19,7 @@ export async function createCajaChicaAction(data: CreateCajaChicaInput) {
     return { error: parsed.error.flatten().fieldErrors };
   }
 
-  const { tipo, monto, fecha, concepto, comprobanteUrl } = parsed.data;
+  const { tipo, monto, fecha, concepto, comprobanteUrl, categoriaGasto, cuentaOrigenId } = parsed.data;
 
   // Obtener saldo anterior
   const last = await prisma.cajaChica.findFirst({
@@ -28,8 +28,25 @@ export async function createCajaChicaAction(data: CreateCajaChicaInput) {
   });
 
   const saldoPrevio = last?.saldoAcumulado ?? 0;
-  const saldoAcumulado =
-    tipo === "INGRESO" ? saldoPrevio + monto : saldoPrevio - monto;
+  const saldoAcumulado = tipo === "INGRESO" ? saldoPrevio + monto : saldoPrevio - monto;
+
+  let finanzaVinculadaId: string | null = null;
+
+  // Si es INGRESO a Caja Chica y tiene cuenta de origen → crear egreso en Finanzas
+  if (tipo === "INGRESO" && cuentaOrigenId) {
+    const finanza = await prisma.finanza.create({
+      data: {
+        tipo: "EGRESO",
+        monto,
+        fecha,
+        concepto: `Fondo Caja Chica: ${concepto}`,
+        categoriaGasto: "Caja Chica",
+        cuentaId: cuentaOrigenId,
+        creadoPorId: userId,
+      },
+    });
+    finanzaVinculadaId = finanza.id;
+  }
 
   const movimiento = await prisma.cajaChica.create({
     data: {
@@ -37,8 +54,10 @@ export async function createCajaChicaAction(data: CreateCajaChicaInput) {
       monto,
       fecha,
       concepto,
+      categoriaGasto: tipo === "GASTO" ? (categoriaGasto ?? null) : null,
       comprobanteUrl: comprobanteUrl ?? null,
       saldoAcumulado,
+      finanzaVinculada: finanzaVinculadaId,
       creadoPorId: userId,
     },
   });
@@ -48,9 +67,10 @@ export async function createCajaChicaAction(data: CreateCajaChicaInput) {
     accion: "CREATE",
     entidad: "CajaChica",
     entidadId: movimiento.id,
-    metadata: { tipo, monto, concepto, saldoAcumulado },
+    metadata: { tipo, monto, concepto, saldoAcumulado, finanzaVinculadaId },
   });
 
+  revalidatePath("/finanzas");
   revalidatePath("/finanzas/caja-chica");
   return { data: movimiento };
 }
@@ -67,19 +87,14 @@ export async function updateCajaChicaAction(id: string, data: CreateCajaChicaInp
     return { error: parsed.error.flatten().fieldErrors };
   }
 
-  const { tipo, monto, fecha, concepto, comprobanteUrl } = parsed.data;
+  const { tipo, monto, fecha, concepto, comprobanteUrl, categoriaGasto } = parsed.data;
 
   const movimientoActual = await prisma.cajaChica.findUnique({ where: { id } });
   if (!movimientoActual) return { error: "Movimiento no encontrado" };
 
-  // Recompute this and all subsequent entries
   const result = await prisma.$transaction(async (tx) => {
-    // Obtener el saldo justo antes de este movimiento
     const anterior = await tx.cajaChica.findFirst({
-      where: {
-        fecha: { lt: movimientoActual.fecha },
-        id: { not: id },
-      },
+      where: { fecha: { lt: movimientoActual.fecha }, id: { not: id } },
       orderBy: [{ fecha: "desc" }, { createdAt: "desc" }],
       select: { saldoAcumulado: true },
     });
@@ -87,7 +102,6 @@ export async function updateCajaChicaAction(id: string, data: CreateCajaChicaInp
     const saldoBase = anterior?.saldoAcumulado ?? 0;
     const nuevoSaldo = tipo === "INGRESO" ? saldoBase + monto : saldoBase - monto;
 
-    // Actualizar el movimiento actual
     const updated = await tx.cajaChica.update({
       where: { id },
       data: {
@@ -95,30 +109,29 @@ export async function updateCajaChicaAction(id: string, data: CreateCajaChicaInp
         monto,
         fecha,
         concepto,
+        categoriaGasto: tipo === "GASTO" ? (categoriaGasto ?? null) : null,
         comprobanteUrl: comprobanteUrl ?? null,
         saldoAcumulado: nuevoSaldo,
       },
     });
 
-    // Obtener y recomputar todos los movimientos posteriores
+    // Recomputar saldos posteriores
     const siguientes = await tx.cajaChica.findMany({
-      where: {
-        fecha: { gte: movimientoActual.fecha },
-        id: { not: id },
-      },
+      where: { fecha: { gte: movimientoActual.fecha }, id: { not: id } },
       orderBy: [{ fecha: "asc" }, { createdAt: "asc" }],
     });
 
     let saldoCorriente = nuevoSaldo;
     for (const mov of siguientes) {
-      saldoCorriente =
-        mov.tipo === "INGRESO"
-          ? saldoCorriente + mov.monto
-          : saldoCorriente - mov.monto;
+      saldoCorriente = mov.tipo === "INGRESO" ? saldoCorriente + mov.monto : saldoCorriente - mov.monto;
+      await tx.cajaChica.update({ where: { id: mov.id }, data: { saldoAcumulado: saldoCorriente } });
+    }
 
-      await tx.cajaChica.update({
-        where: { id: mov.id },
-        data: { saldoAcumulado: saldoCorriente },
+    // Actualizar finanza vinculada si existe
+    if (updated.finanzaVinculada) {
+      await tx.finanza.update({
+        where: { id: updated.finanzaVinculada },
+        data: { monto, fecha, concepto: `Fondo Caja Chica: ${concepto}` },
       });
     }
 
@@ -133,6 +146,43 @@ export async function updateCajaChicaAction(id: string, data: CreateCajaChicaInp
     metadata: { tipo, monto, concepto },
   });
 
+  revalidatePath("/finanzas");
   revalidatePath("/finanzas/caja-chica");
   return { data: result };
+}
+
+/** Resumen de caja chica para el PDF — llamado desde el client */
+export async function getCajaChicaResumenAction(desdeAnio: number, desdeMes: number, hastaAnio: number, hastaMes: number) {
+  await authorizeAction(["GERENCIA", "ADMINISTRADOR"]);
+
+  const desde = new Date(desdeAnio, desdeMes - 1, 1);
+  const hasta = new Date(hastaAnio, hastaMes, 0, 23, 59, 59, 999);
+
+  const movimientos = await prisma.cajaChica.findMany({
+    where: { fecha: { gte: desde, lte: hasta } },
+    select: { tipo: true, monto: true, categoriaGasto: true, concepto: true, fecha: true, saldoAcumulado: true },
+    orderBy: { fecha: "asc" },
+  });
+
+  const totalIngresos = movimientos.filter((m) => m.tipo === "INGRESO").reduce((s, m) => s + m.monto, 0);
+  const totalGastos = movimientos.filter((m) => m.tipo === "GASTO").reduce((s, m) => s + m.monto, 0);
+  const saldoFinal = movimientos.length > 0 ? movimientos[movimientos.length - 1].saldoAcumulado : 0;
+
+  // Gastos por categoría
+  const catMap = new Map<string, number>();
+  movimientos.filter((m) => m.tipo === "GASTO").forEach((m) => {
+    const cat = m.categoriaGasto ?? "Sin categoría";
+    catMap.set(cat, (catMap.get(cat) ?? 0) + m.monto);
+  });
+  const gastosPorCategoria = Array.from(catMap.entries())
+    .map(([cat, monto]) => ({ cat, monto }))
+    .sort((a, b) => b.monto - a.monto);
+
+  return {
+    totalIngresos,
+    totalGastos,
+    saldoFinal,
+    movimientos: movimientos.length,
+    gastosPorCategoria,
+  };
 }

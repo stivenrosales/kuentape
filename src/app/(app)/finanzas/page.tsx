@@ -13,9 +13,15 @@ import {
   getCuentasBancarias,
   getServiciosConDeuda,
 } from "@/features/finanzas/queries";
+import {
+  getCajaChicaMovimientos,
+  getCajaChicaSaldo,
+  getCajaChicaBalanceDiario,
+} from "@/features/caja-chica/queries";
+import { getCobranzasPorContador } from "@/features/cobranzas/queries";
 import { FinanzasOverview } from "@/features/finanzas/components/finanzas-overview";
 
-type Tab = "overview" | "transacciones" | "analisis";
+type Tab = "transacciones" | "cobranzas" | "caja-chica" | "analisis";
 
 interface SearchParams {
   anio?: string;
@@ -37,9 +43,9 @@ export default async function FinanzasPage({
   const anio = sp.anio ? Number(sp.anio) : now.getFullYear();
   const mes = sp.mes ? Number(sp.mes) : now.getMonth() + 1;
 
-  const rawTab = sp.tab ?? "overview";
+  const rawTab = sp.tab ?? "transacciones";
   const tab: Tab =
-    rawTab === "transacciones" || rawTab === "analisis" ? rawTab : "overview";
+    rawTab === "analisis" || rawTab === "caja-chica" || rawTab === "cobranzas" ? rawTab : "transacciones";
 
   /* ------------------------------------------------------------------ */
   /* Datos siempre necesarios (overview + KPI bar)                       */
@@ -51,18 +57,13 @@ export default async function FinanzasPage({
     getServiciosConDeuda(),
   ]);
 
-  /* Últimas 10 transacciones — siempre visibles en overview */
-  const { items: ultimasTransacciones } = await getFinanzas({
-    page: 1,
-    pageSize: 10,
-  });
-
   /* ------------------------------------------------------------------ */
   /* Datos diferidos según tab                                           */
   /* ------------------------------------------------------------------ */
-  let todasTransacciones = undefined as
-    | Awaited<ReturnType<typeof getFinanzas>>["items"]
-    | undefined;
+  // Transacciones siempre cargadas (necesarias para PDF + tab transacciones)
+  const { items: todasTransacciones } = await getFinanzas({ page: 1, pageSize: 200 });
+
+  let _unused = undefined as undefined; // placeholder
 
   let analisisData = undefined as
     | {
@@ -75,9 +76,25 @@ export default async function FinanzasPage({
       }
     | undefined;
 
-  if (tab === "transacciones") {
-    const result = await getFinanzas({ page: 1, pageSize: 200 });
-    todasTransacciones = result.items;
+  let cajaChicaData = undefined as
+    | { saldo: number; balanceDiario: Awaited<ReturnType<typeof getCajaChicaBalanceDiario>>; movimientos: Awaited<ReturnType<typeof getCajaChicaMovimientos>> }
+    | undefined;
+
+  let cobranzasData = undefined as
+    | Awaited<ReturnType<typeof getCobranzasPorContador>>
+    | undefined;
+
+  if (tab === "cobranzas") {
+    cobranzasData = await getCobranzasPorContador(anio, mes);
+  }
+
+  if (tab === "caja-chica") {
+    const [saldo, balanceDiario, movimientos] = await Promise.all([
+      getCajaChicaSaldo(),
+      getCajaChicaBalanceDiario(anio, mes),
+      getCajaChicaMovimientos({ anio, mes }),
+    ]);
+    cajaChicaData = { saldo, balanceDiario, movimientos };
   }
 
   if (tab === "analisis") {
@@ -89,10 +106,10 @@ export default async function FinanzasPage({
       montoPorCobrarPorContador,
       egresosPorCategoria,
     ] = await Promise.all([
-      getFinanzasMensuales(anio),
-      getIngresosPorTipoServicio(anio),
-      getVentasPorContador(anio),
-      getVentasPorServicio(anio),
+      getFinanzasMensuales(anio, mes),
+      getIngresosPorTipoServicio(anio, mes),
+      getVentasPorContador(anio, mes),
+      getVentasPorServicio(anio, mes),
       getMontoPorCobrarPorContador(),
       getEgresosPorCategoria(anio, mes),
     ]);
@@ -100,32 +117,21 @@ export default async function FinanzasPage({
     analisisData = {
       finanzasMensuales,
       ingresosPorTipoServicio,
-      ventasPorContador: ventasPorContador as any,
-      ventasPorServicio: ventasPorServicio as any,
+      ventasPorContador,
+      ventasPorServicio,
       montoPorCobrarPorContador,
       egresosPorCategoria,
     };
   }
 
-  /* ------------------------------------------------------------------ */
-  /* Descripción del período                                             */
-  /* ------------------------------------------------------------------ */
-  const periodoLabel = new Date(anio, mes - 1).toLocaleDateString("es-PE", {
-    month: "long",
-    year: "numeric",
-  });
-
   return (
-    <div className="space-y-4">
-      <PageHeader
-        title="Finanzas"
-        description={`Período: ${periodoLabel}`}
-      />
+    <div className="space-y-6">
+      <PageHeader title="Finanzas" />
 
       <FinanzasOverview
         kpis={kpis}
         cobradoPorCuenta={cobradoPorCuenta}
-        ultimasTransacciones={ultimasTransacciones as any}
+        ultimasTransacciones={[]}
         finanzasMensuales={analisisData?.finanzasMensuales}
         ingresosPorTipoServicio={analisisData?.ingresosPorTipoServicio}
         ventasPorContador={analisisData?.ventasPorContador}
@@ -139,6 +145,10 @@ export default async function FinanzasPage({
         anio={anio}
         mes={mes}
         tab={tab}
+        cajaChicaSaldo={cajaChicaData?.saldo}
+        cajaChicaBalanceDiario={cajaChicaData?.balanceDiario}
+        cajaChicaMovimientos={cajaChicaData?.movimientos as any}
+        cobranzasData={cobranzasData}
       />
     </div>
   );

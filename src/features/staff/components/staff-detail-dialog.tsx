@@ -124,10 +124,10 @@ export function StaffDetailDialog({ member, onClose }: StaffDetailDialogProps) {
   React.useEffect(() => {
     if (!member) return;
     function handleEsc(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") { e.stopImmediatePropagation(); onClose(); }
     }
-    document.addEventListener("keydown", handleEsc);
-    return () => document.removeEventListener("keydown", handleEsc);
+    document.addEventListener("keydown", handleEsc, true);
+    return () => document.removeEventListener("keydown", handleEsc, true);
   }, [member, onClose]);
 
   if (!member) return null;
@@ -296,7 +296,7 @@ function DetailContent({
           </p>
           <Select
             value={m.role}
-            onValueChange={saveRole}
+            onValueChange={(v) => { if (!v) return; saveRole(v); }}
             disabled={savingRole}
           >
             <SelectTrigger className="w-full">

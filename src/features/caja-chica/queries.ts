@@ -42,29 +42,39 @@ export async function getCajaChicaSaldo(): Promise<number> {
   return last?.saldoAcumulado ?? 0;
 }
 
-export async function getCajaChicaBalanceHistory(anio: number) {
-  const fechaInicio = new Date(anio, 0, 1);
-  const fechaFin = new Date(anio, 11, 31, 23, 59, 59, 999);
+/** Saldo diario del mes seleccionado — para sparkline */
+export async function getCajaChicaBalanceDiario(anio: number, mes: number) {
+  const fechaInicio = new Date(anio, mes - 1, 1);
+  const fechaFin = new Date(anio, mes, 0, 23, 59, 59, 999);
+  const diasEnMes = new Date(anio, mes, 0).getDate();
 
+  // Saldo inicial: último saldo antes del mes
+  const prevMovimiento = await prisma.cajaChica.findFirst({
+    where: { fecha: { lt: fechaInicio } },
+    orderBy: [{ fecha: "desc" }, { createdAt: "desc" }],
+    select: { saldoAcumulado: true },
+  });
+  const saldoInicial = prevMovimiento?.saldoAcumulado ?? 0;
+
+  // Movimientos del mes
   const movimientos = await prisma.cajaChica.findMany({
     where: { fecha: { gte: fechaInicio, lte: fechaFin } },
     select: { fecha: true, saldoAcumulado: true },
-    orderBy: { fecha: "asc" },
+    orderBy: [{ fecha: "asc" }, { createdAt: "asc" }],
   });
 
-  // Agrupar por mes: tomar el último saldo del mes
-  const porMes: Record<number, number> = {};
+  // Agrupar por día: tomar el último saldo del día
+  const porDia: Record<number, number> = {};
   for (const m of movimientos) {
-    const mes = new Date(m.fecha).getMonth();
-    porMes[mes] = m.saldoAcumulado;
+    const dia = new Date(m.fecha).getDate();
+    porDia[dia] = m.saldoAcumulado;
   }
 
-  // Si el mes no tiene movimientos, heredar el saldo del mes anterior
-  let lastSaldo = 0;
-  return MESES.map((label, i) => {
-    if (porMes[i] !== undefined) {
-      lastSaldo = porMes[i];
-    }
-    return { mes: label, saldo: lastSaldo };
+  // Generar array de días, heredando saldo del día anterior
+  let saldo = saldoInicial;
+  return Array.from({ length: diasEnMes }, (_, i) => {
+    const dia = i + 1;
+    if (porDia[dia] !== undefined) saldo = porDia[dia];
+    return { dia: String(dia), saldo };
   });
 }

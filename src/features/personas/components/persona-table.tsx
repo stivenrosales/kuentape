@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import type { TipoPersona, Regimen, EstadoPersona } from "@prisma/client";
 import { ContextMenuRow } from "@/components/context-menu-row";
 import { updatePersonaEstadoAction } from "@/features/personas/actions";
+import { ClienteDetailDialog } from "./cliente-detail-dialog";
 import { cn } from "@/lib/utils";
 
 export interface PersonaRow {
@@ -90,6 +91,7 @@ export function PersonaTable({ data, total = 0, page = 1, pageSize = 25 }: Perso
 
   const [sortKey, setSortKey] = React.useState<SortKey>("razonSocial");
   const [sortDir, setSortDir] = React.useState<SortDir>("asc");
+  const [selectedId, setSelectedId] = React.useState<string | null>(null);
 
   function handleSort(key: SortKey) {
     if (sortKey === key) {
@@ -128,6 +130,7 @@ export function PersonaTable({ data, total = 0, page = 1, pageSize = 25 }: Perso
   const sorted = sortItems(data);
 
   return (
+    <>
     <div className="rounded-lg border border-border bg-card shadow-sm overflow-hidden">
       <table className="w-full text-sm border-collapse" style={{ tableLayout: "fixed" }}>
         <colgroup><col style={{ width: "35%" }} /><col style={{ width: "15%" }} /><col style={{ width: "12%" }} /><col style={{ width: "12%" }} /><col style={{ width: "10%" }} /><col style={{ width: "16%" }} /></colgroup>
@@ -152,7 +155,7 @@ export function PersonaTable({ data, total = 0, page = 1, pageSize = 25 }: Perso
             sorted.map((row, i) => (
               <ContextMenuRow
                 key={row.id}
-                onClick={() => router.push(`/clientes/${row.id}`)}
+                onClick={() => setSelectedId(row.id)}
                 className={`cursor-pointer transition-colors hover:bg-primary/5 ${i % 2 === 0 ? "bg-muted/10" : "bg-background"}`}
                 deleteLabel="Archivar"
                 confirmMessage={`¿Seguro que querés archivar a "${row.razonSocial}"?`}
@@ -161,18 +164,18 @@ export function PersonaTable({ data, total = 0, page = 1, pageSize = 25 }: Perso
                   router.refresh();
                 }}
               >
-                <td className="px-3 py-2.5 font-medium truncate">{row.razonSocial}</td>
-                <td className="px-3 py-2.5 font-mono text-xs">{row.ruc}</td>
-                <td className="px-3 py-2.5">
+                <td className="px-3 py-2 text-xs font-medium truncate">{row.razonSocial}</td>
+                <td className="px-3 py-2 font-mono text-xs">{row.ruc}</td>
+                <td className="px-3 py-2">
                   <Badge className={`text-[10px] ${TIPO_BADGE[row.tipoPersona].className}`}>{TIPO_BADGE[row.tipoPersona].label}</Badge>
                 </td>
-                <td className="px-3 py-2.5">
+                <td className="px-3 py-2">
                   <Badge variant="outline" className="text-[10px]">{row.regimen}</Badge>
                 </td>
-                <td className="px-3 py-2.5">
+                <td className="px-3 py-2">
                   <Badge className={`text-[10px] ${ESTADO_BADGE[row.estado].className}`}>{ESTADO_BADGE[row.estado].label}</Badge>
                 </td>
-                <td className="px-3 py-2.5 text-xs text-muted-foreground truncate">
+                <td className="px-3 py-2 text-xs text-muted-foreground truncate">
                   {row.contadorAsignado.nombre} {row.contadorAsignado.apellido}
                 </td>
               </ContextMenuRow>
@@ -192,5 +195,13 @@ export function PersonaTable({ data, total = 0, page = 1, pageSize = 25 }: Perso
         </div>
       )}
     </div>
+
+    {selectedId && (
+      <ClienteDetailDialog
+        clienteId={selectedId}
+        onClose={() => { setSelectedId(null); router.refresh(); }}
+      />
+    )}
+    </>
   );
 }

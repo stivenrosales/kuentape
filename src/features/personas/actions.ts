@@ -245,3 +245,45 @@ export async function deletePersonaAction(id: string) {
   revalidatePath("/clientes");
   return { success: true };
 }
+
+/** Load full client detail for popup */
+export async function getClienteDetailAction(id: string) {
+  const session = await authorizeAction(["GERENCIA", "ADMINISTRADOR", "CONTADOR"]);
+  const role = (session.user as any).role as string;
+  const canManage = role === "GERENCIA" || role === "ADMINISTRADOR" || role === "CONTADOR";
+
+  const { getPersonaDetail } = await import("./queries");
+
+  const persona = await getPersonaDetail(id);
+  if (!persona) return null;
+
+  const [servicios, incidencias, libros] = await Promise.all([
+    prisma.servicio.findMany({
+      where: { personaId: id },
+      select: {
+        id: true, periodo: true, precioFinal: true,
+        montoCobrado: true, montoRestante: true, estadoCobranza: true,
+        tipoServicio: { select: { nombre: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.incidencia.findMany({
+      where: { personaId: id },
+      select: {
+        id: true, titulo: true, prioridad: true,
+        estado: true, periodo: true, createdAt: true,
+      },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.libro.findMany({
+      where: { personaId: id },
+      select: {
+        id: true, tipoLibro: true, anio: true,
+        mes: true, completado: true,
+      },
+      orderBy: [{ anio: "desc" }, { mes: "asc" }, { tipoLibro: "asc" }],
+    }),
+  ]);
+
+  return { persona, servicios, incidencias, libros, canManage };
+}

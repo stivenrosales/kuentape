@@ -65,6 +65,7 @@ interface ServicioDetailProps {
     declaracionAnualDetalles: DeclaracionItem[];
   };
   cuentas: CuentaOption[];
+  equipo?: { id: string; nombre: string; apellido: string }[];
   canArchivar: boolean;
   canEdit: boolean;
 }
@@ -140,10 +141,10 @@ export function ServicioDetailClient({
         )}
 
         {canEdit && (
-          <Button size="sm" variant="outline" render={<Link href={`/servicios/${servicio.id}/editar`} />}>
+          <Link href={`/servicios/${servicio.id}/editar`} className="inline-flex items-center rounded-lg border border-input bg-background px-3 py-1.5 text-xs font-medium hover:bg-accent hover:text-accent-foreground transition-colors">
             <Pencil className="size-4 mr-1" />
             Editar
-          </Button>
+          </Link>
         )}
 
         {canArchivar && servicio.estado !== "ARCHIVADO" && (

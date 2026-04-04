@@ -69,7 +69,6 @@ export function IncidenciaFilters({
   const estado = sp.get("estado") ?? EMPTY;
   const contadorId = sp.get("contadorId") ?? EMPTY;
 
-  // Periodo
   const periodoRaw = sp.get("periodo") ?? "";
   const periodoParts = periodoRaw ? periodoRaw.split("-") : ["", ""];
   const anio = periodoParts[0] ?? "";
@@ -81,11 +80,8 @@ export function IncidenciaFilters({
   function updateParam(key: string, value: string | null) {
     const params = new URLSearchParams(sp.toString());
     params.delete("page");
-    if (value && value !== EMPTY) {
-      params.set(key, value);
-    } else {
-      params.delete(key);
-    }
+    if (value && value !== EMPTY) params.set(key, value);
+    else params.delete(key);
     router.push(`${pathname}?${params.toString()}`);
   }
 
@@ -101,24 +97,18 @@ export function IncidenciaFilters({
   function handlePeriodoChange(newAnio: string | null, newMes: string | null) {
     const a = !newAnio || newAnio === EMPTY ? "" : newAnio;
     const m = !newMes || newMes === EMPTY ? "" : newMes;
-    const periodo = a && m ? `${a}-${m}` : null;
-    updateParam("periodo", periodo);
+    updateParam("periodo", a && m ? `${a}-${m}` : null);
   }
 
-  const prioridadLabel =
-    PRIORIDAD_OPTIONS.find((o) => o.value === prioridad)?.label ?? "Prioridad";
-  const estadoLabel =
-    ESTADO_OPTIONS.find((o) => o.value === estado)?.label ?? "Estado";
-  const contadorLabel =
-    contadorId !== EMPTY
-      ? (() => {
-          const c = contadores.find((c) => c.id === contadorId);
-          return c ? `${c.nombre} ${c.apellido}` : "Contador";
-        })()
-      : "Todos los contadores";
-  const mesLabel =
-    MESES.find((m) => m.value === mesVal)?.label ?? "Mes";
+  const prioridadLabel = PRIORIDAD_OPTIONS.find((o) => o.value === prioridad)?.label ?? "Prioridad";
+  const estadoLabel = ESTADO_OPTIONS.find((o) => o.value === estado)?.label ?? "Estado";
+  const contadorLabel = contadorId !== EMPTY
+    ? (() => { const c = contadores.find((c) => c.id === contadorId); return c ? `${c.nombre} ${c.apellido}` : "Contador"; })()
+    : "Todos los contadores";
+  const mesLabel = MESES.find((m) => m.value === mesVal)?.label ?? "Mes";
   const anioLabel = anio || "Año";
+
+  const S = "bg-card text-xs h-9";
 
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -130,76 +120,60 @@ export function IncidenciaFilters({
           value={searchInput}
           onChange={handleSearch}
           placeholder="Buscar incidencia..."
-          className="h-8 w-[220px] rounded-md border border-input bg-background pl-8 pr-3 text-sm outline-none focus:ring-1 focus:ring-ring placeholder:text-muted-foreground"
+          className="h-9 w-[200px] rounded-lg border border-input bg-card pl-8 pr-3 text-xs outline-none focus:ring-1 focus:ring-ring placeholder:text-muted-foreground"
         />
       </div>
 
       {/* Prioridad */}
-      <Select value={prioridad} onValueChange={(v) => updateParam("prioridad", v)}>
-        <SelectTrigger className="w-[110px]">{prioridadLabel}</SelectTrigger>
+      <Select value={prioridad} onValueChange={(v) => v && updateParam("prioridad", v)}>
+        <SelectTrigger className={`w-[110px] ${S}`}>{prioridadLabel}</SelectTrigger>
         <SelectContent>
           {PRIORIDAD_OPTIONS.map((o) => (
-            <SelectItem key={o.value} value={o.value}>
-              {o.label}
-            </SelectItem>
+            <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
           ))}
         </SelectContent>
       </Select>
 
       {/* Estado */}
-      <Select value={estado} onValueChange={(v) => updateParam("estado", v)}>
-        <SelectTrigger className="w-[120px]">{estadoLabel}</SelectTrigger>
+      <Select value={estado} onValueChange={(v) => v && updateParam("estado", v)}>
+        <SelectTrigger className={`w-[120px] ${S}`}>{estadoLabel}</SelectTrigger>
         <SelectContent>
           {ESTADO_OPTIONS.map((o) => (
-            <SelectItem key={o.value} value={o.value}>
-              {o.label}
-            </SelectItem>
+            <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
           ))}
         </SelectContent>
       </Select>
 
       {/* Año */}
-      <Select
-        value={anio || EMPTY}
-        onValueChange={(v) => handlePeriodoChange(v, mesVal || EMPTY)}
-      >
-        <SelectTrigger className="w-[80px]">{anioLabel}</SelectTrigger>
+      <Select value={anio || EMPTY} onValueChange={(v) => v && handlePeriodoChange(v, mesVal || EMPTY)}>
+        <SelectTrigger className={`w-[90px] ${S}`}>{anioLabel}</SelectTrigger>
         <SelectContent>
           <SelectItem value={EMPTY}>Año</SelectItem>
           {years.map((y) => (
-            <SelectItem key={y} value={String(y)}>
-              {y}
-            </SelectItem>
+            <SelectItem key={y} value={String(y)}>{y}</SelectItem>
           ))}
         </SelectContent>
       </Select>
 
       {/* Mes */}
-      <Select
-        value={mesVal || EMPTY}
-        onValueChange={(v) => handlePeriodoChange(anio || EMPTY, v)}
-      >
-        <SelectTrigger className="w-[110px]">{mesLabel}</SelectTrigger>
+      <Select value={mesVal || EMPTY} onValueChange={(v) => v && handlePeriodoChange(anio || EMPTY, v)}>
+        <SelectTrigger className={`w-[130px] ${S}`}>{mesLabel}</SelectTrigger>
         <SelectContent>
           <SelectItem value={EMPTY}>Mes</SelectItem>
           {MESES.map((m) => (
-            <SelectItem key={m.value} value={m.value}>
-              {m.label}
-            </SelectItem>
+            <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>
           ))}
         </SelectContent>
       </Select>
 
       {/* Contador (solo admin) */}
       {isAdmin && contadores.length > 0 && (
-        <Select value={contadorId} onValueChange={(v) => updateParam("contadorId", v)}>
-          <SelectTrigger className="w-[170px]">{contadorLabel}</SelectTrigger>
+        <Select value={contadorId} onValueChange={(v) => v && updateParam("contadorId", v)}>
+          <SelectTrigger className={`w-[200px] ${S}`}>{contadorLabel}</SelectTrigger>
           <SelectContent>
             <SelectItem value={EMPTY}>Todos los contadores</SelectItem>
             {contadores.map((c) => (
-              <SelectItem key={c.id} value={c.id}>
-                {c.nombre} {c.apellido}
-              </SelectItem>
+              <SelectItem key={c.id} value={c.id}>{c.nombre} {c.apellido}</SelectItem>
             ))}
           </SelectContent>
         </Select>

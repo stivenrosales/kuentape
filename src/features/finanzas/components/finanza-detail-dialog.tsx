@@ -13,6 +13,7 @@ import {
   CheckCircle,
   ZoomIn,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { formatCurrency, formatDate } from "@/lib/format";
@@ -45,38 +46,48 @@ const TIPO_CONFIG = {
 } as const;
 
 export function FinanzaDetailDialog({ finanza, isAdmin = false, onClose }: FinanzaDetailDialogProps) {
+  const router = useRouter();
   const config = TIPO_CONFIG[finanza.tipo];
   const { Icon } = config;
   const [imageExpanded, setImageExpanded] = React.useState(false);
   const [validated, setValidated] = React.useState(finanza.validado ?? false);
   const [validating, setValidating] = React.useState(false);
+  const didChangeRef = React.useRef(false);
+
+  const handleClose = React.useCallback(() => {
+    if (didChangeRef.current) router.refresh();
+    onClose();
+  }, [onClose, router]);
 
   React.useEffect(() => {
-    function handleEsc(e: KeyboardEvent) { if (e.key === "Escape") { if (imageExpanded) setImageExpanded(false); else onClose(); } }
-    document.addEventListener("keydown", handleEsc);
-    return () => document.removeEventListener("keydown", handleEsc);
-  }, [onClose, imageExpanded]);
+    function handleEsc(e: KeyboardEvent) { if (e.key === "Escape") { e.stopImmediatePropagation(); if (imageExpanded) setImageExpanded(false); else handleClose(); } }
+    document.addEventListener("keydown", handleEsc, true);
+    return () => document.removeEventListener("keydown", handleEsc, true);
+  }, [handleClose, imageExpanded]);
 
   async function handleValidate() {
     setValidating(true);
     try {
       const res = await fetch(`/api/finanzas/${finanza.id}/validar`, { method: "POST" });
-      if (res.ok) {
-        const data = await res.json();
+      const data = await res.json().catch(() => null);
+      if (res.ok && data) {
         setValidated(data.validado);
+        didChangeRef.current = true;
         toast.success(data.validado ? "Pago validado" : "Validación removida");
       } else {
-        toast.error("Error al validar");
+        console.error("Validar error:", res.status, data);
+        toast.error(data?.error || `Error al validar (${res.status})`);
       }
-    } catch {
-      toast.error("Error al validar");
+    } catch (err) {
+      console.error("Validar fetch error:", err);
+      toast.error("Error de conexión al validar");
     }
     setValidating(false);
   }
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={handleClose}>
         <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
         <div className="relative w-full max-w-md bg-card rounded-lg shadow-2xl overflow-hidden animate-in zoom-in-95 fade-in duration-150 flex flex-col max-h-[85vh]" onClick={(e) => e.stopPropagation()}>
           {/* Header */}
@@ -88,7 +99,7 @@ export function FinanzaDetailDialog({ finanza, isAdmin = false, onClose }: Finan
                 <Badge className={cn("mt-0.5 text-[10px]", config.badgeClass)}>{config.label}</Badge>
               </div>
             </div>
-            <button onClick={onClose} className="ml-3 shrink-0 p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted">
+            <button onClick={handleClose} className="ml-3 shrink-0 p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted">
               <X className="h-4 w-4" />
             </button>
           </div>
