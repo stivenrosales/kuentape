@@ -43,7 +43,6 @@ export default async function ProspectoDetailPage({
 
   const canConvert =
     lead.estado === "COTIZADO" &&
-    lead.estado !== "CONVERTIDO" &&
     ["GERENCIA", "ADMINISTRADOR"].includes((session.user as any).role);
 
   return (
