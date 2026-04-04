@@ -65,7 +65,7 @@ const BACKWARD_TRANSITIONS: Partial<Record<EstadoLead, EstadoLead>> = {
 
 function isValidTransition(from: EstadoLead, to: EstadoLead): boolean {
   if (from === "CONVERTIDO") return false; // CONVERTIDO is a terminal state
-  if (to === "PERDIDO") return from !== "CONVERTIDO"; // any→PERDIDO
+  if (to === "PERDIDO") return true; // any (non-CONVERTIDO, already filtered above) → PERDIDO
   if (FORWARD_TRANSITIONS[from] === to) return true;
   if (BACKWARD_TRANSITIONS[from] === to) return true;
   return false;
