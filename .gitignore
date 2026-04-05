@@ -33,9 +33,10 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
-# brand assets (client-specific, not committed)
-public/brand/*
-!public/brand/.example/
+# brand assets — when adding a second client, gitignore these
+# and serve from R2 or env-configured path instead
+# public/brand/*
+# !public/brand/.example/
 
 # vercel
 .vercel
