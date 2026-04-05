@@ -1,5 +1,6 @@
 "use client";
 
+import { brand } from "@/lib/brand";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
@@ -134,18 +135,18 @@ export function AppSidebar({ userName, userEmail, userRole }: AppSidebarProps) {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/logo-mark.svg"
-              alt="C&A"
+              src={brand.logo.mark}
+              alt={brand.name}
               className="h-full w-full object-contain"
             />
           </div>
           {!isCollapsed && (
             <div className="flex flex-col overflow-hidden leading-tight">
               <span className="truncate text-sm font-bold text-sidebar-foreground">
-                {"C&A"}
+                {brand.name}
               </span>
               <span className="truncate text-[10px] text-muted-foreground">
-                Contadores y Asociados
+                {brand.tagline}
               </span>
             </div>
           )}

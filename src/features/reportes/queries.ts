@@ -1,3 +1,4 @@
+import { brand } from "@/lib/brand";
 import { prisma } from "@/lib/prisma";
 
 const MESES_NOMBRES = [
@@ -172,7 +173,7 @@ export async function getMonthlyReportData(
   return {
     mes: MESES_NOMBRES[mes - 1] ?? String(mes),
     anio,
-    estudio: "Estudio Contable Contadores & Asociados",
+    estudio: brand.fullName,
     contador: `${contador.nombre} ${contador.apellido}`,
     grupos,
     totalGeneral,
@@ -245,7 +246,7 @@ export async function getCajaChicaReportData(
   return {
     mes: MESES_NOMBRES[mes - 1] ?? String(mes),
     anio,
-    estudio: "Estudio Contable Contadores & Asociados",
+    estudio: brand.fullName,
     saldoInicial,
     totalIngresos,
     totalGastos,

@@ -3,6 +3,7 @@
 import * as React from "react";
 import { DownloadIcon, Loader2Icon, XIcon } from "lucide-react";
 
+import { brand } from "@/lib/brand";
 import { formatCurrency } from "@/lib/format";
 import type { ServicioListItem } from "../queries-list";
 
@@ -167,7 +168,7 @@ export function ServicioPdfDialog({ open, onOpenChange, servicios, periodoLabel 
       }
 
       const tp = pdf.getNumberOfPages();
-      for (let i = 1; i <= tp; i++) { pdf.setPage(i); pdf.setFontSize(7); pdf.setTextColor(148, 163, 184); pdf.text("Generado por C&A — Contadores y Asociados", m, ph - 4); pdf.text(`Pagina ${i} de ${tp}`, pw - m, ph - 4, { align: "right" }); }
+      for (let i = 1; i <= tp; i++) { pdf.setPage(i); pdf.setFontSize(7); pdf.setTextColor(148, 163, 184); pdf.text(`Generado por ${brand.fullName}`, m, ph - 4); pdf.text(`Pagina ${i} de ${tp}`, pw - m, ph - 4, { align: "right" }); }
       pdf.save(`servicios-${periodoLabel.replace(/\s+/g, "-").toLowerCase()}.pdf`);
     } catch (err) { console.error("Error generando PDF:", err); }
     finally { setGenerating(false); }
@@ -202,9 +203,9 @@ export function ServicioPdfDialog({ open, onOpenChange, servicios, periodoLabel 
             {/* Header */}
             <div style={{ borderBottom: `2.5px solid ${C.primary}`, paddingBottom: "12px", marginBottom: "24px", display: "flex", alignItems: "center", gap: "12px" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/logo.svg" alt="C&A" style={{ width: "54px", height: "54px", objectFit: "contain" }} crossOrigin="anonymous" />
+              <img src={brand.logo.full} alt={brand.name} style={{ width: "54px", height: "54px", objectFit: "contain" }} crossOrigin="anonymous" />
               <div style={{ flex: 1 }}>
-                <h1 style={{ fontSize: "18px", fontWeight: 700, color: C.primary, margin: 0 }}>C&amp;A — Contadores y Asociados</h1>
+                <h1 style={{ fontSize: "18px", fontWeight: 700, color: C.primary, margin: 0 }}>{brand.fullName}</h1>
                 <div style={{ display: "flex", justifyContent: "space-between", marginTop: "4px" }}>
                   <p style={{ fontSize: "11px", color: C.gray, margin: 0 }}>Reporte de Servicios: <strong style={{ color: C.text }}>{periodoLabel}</strong></p>
                   <p style={{ fontSize: "10px", color: C.grayLight, margin: 0 }}>Generado el {genAt}</p>
@@ -312,7 +313,7 @@ export function ServicioPdfDialog({ open, onOpenChange, servicios, periodoLabel 
             {/* Footer */}
             <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: "10px", textAlign: "center" }}>
               <p style={{ fontSize: "9px", color: C.grayLight, margin: 0 }}>
-                Generado por C&amp;A &bull; {servicios.length} servicios &bull; {periodoLabel}
+                {`Generado por ${brand.fullName}`} &bull; {servicios.length} servicios &bull; {periodoLabel}
               </p>
             </div>
           </div>

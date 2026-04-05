@@ -9,6 +9,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { brand } from "@/lib/brand";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { getCajaChicaResumenAction } from "@/features/caja-chica/actions";
 import type { FinanzaRow } from "./finanza-table";
@@ -339,7 +340,7 @@ export function FinanzaPdfDialog({
         pdf.setFontSize(7);
         pdf.setFont("helvetica", "normal");
         pdf.setTextColor(148, 163, 184);
-        pdf.text("Generado por C&A — Contadores y Asociados", m, ph - 4);
+        pdf.text(`Generado por ${brand.fullName}`, m, ph - 4);
         pdf.text(`Pagina ${i} de ${totalPages}`, pw - m, ph - 4, { align: "right" });
       }
 
@@ -439,10 +440,10 @@ export function FinanzaPdfDialog({
             {/* ===== 1. Header ===== */}
             <div style={{ borderBottom: "2.5px solid #5B7FBE", paddingBottom: "12px", marginBottom: "20px", display: "flex", alignItems: "center", gap: "14px" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/logo.svg" alt="C&A" style={{ width: "60px", height: "60px", objectFit: "contain" }} crossOrigin="anonymous" />
+              <img src={brand.logo.full} alt={brand.name} style={{ width: "60px", height: "60px", objectFit: "contain" }} crossOrigin="anonymous" />
               <div style={{ flex: 1 }}>
                 <h1 style={{ fontSize: "20px", fontWeight: 700, color: "#5B7FBE", margin: 0, letterSpacing: "-0.02em" }}>
-                  C&amp;A — Contadores y Asociados
+                  {brand.fullName}
                 </h1>
                 <div style={{ display: "flex", justifyContent: "space-between", marginTop: "4px" }}>
                   <p style={{ fontSize: "12px", color: "#64748b", margin: 0 }}>
@@ -770,7 +771,7 @@ export function FinanzaPdfDialog({
             {/* ===== 11. Footer ===== */}
             <div style={{ borderTop: "1px solid #e2e8f0", paddingTop: "10px", textAlign: "center" }}>
               <p style={{ fontSize: "9px", color: "#94a3b8", margin: 0 }}>
-                Generado por C&amp;A — Contadores y Asociados &bull; {sorted.length} transacciones &bull; {rangeLabel}
+                {`Generado por ${brand.fullName}`} &bull; {sorted.length} transacciones &bull; {rangeLabel}
               </p>
             </div>
           </div>

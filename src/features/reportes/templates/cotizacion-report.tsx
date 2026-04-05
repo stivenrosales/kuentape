@@ -5,6 +5,7 @@ import {
   View,
   StyleSheet,
 } from "@react-pdf/renderer";
+import { brand } from "@/lib/brand";
 
 function centavosToSoles(centavos: number): string {
   return new Intl.NumberFormat("es-PE", {
@@ -291,14 +292,14 @@ export function CotizacionReportDocument({ data }: CotizacionReportProps) {
   return (
     <Document
       title={`Cotización — ${fullName}`}
-      author="Estudio Contable Contadores & Asociados"
+      author={brand.fullName}
     >
       <Page size="A4" style={styles.page}>
         {/* Header */}
         <View style={styles.headerStrip}>
           <Text style={styles.headerStripTitle}>Cotización de Servicios</Text>
           <Text style={styles.headerStripSub}>
-            Estudio Contable Contadores & Asociados
+            {brand.fullName}
           </Text>
           <Text style={styles.headerStripDate}>Fecha de emisión: {hoy}</Text>
         </View>
@@ -433,7 +434,7 @@ export function CotizacionReportDocument({ data }: CotizacionReportProps) {
         {/* Footer */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>
-            Estudio Contable Contadores & Asociados — Documento generado
+            {brand.fullName} — Documento generado
             automáticamente, no requiere firma física.
           </Text>
         </View>

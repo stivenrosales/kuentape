@@ -33,6 +33,10 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# brand assets (client-specific, not committed)
+public/brand/*
+!public/brand/.example/
+
 # vercel
 .vercel
 

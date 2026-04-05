@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { loginAction } from "@/features/auth/actions";
 import { Loader2, Lock, Mail } from "lucide-react";
+import { brand } from "@/lib/brand";
 
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
@@ -37,8 +38,8 @@ export default function LoginPage() {
         <div className="mb-8 flex justify-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/logo.svg"
-            alt="C&A — Contadores y Asociados"
+            src={brand.logo.full}
+            alt={brand.fullName}
             className="h-48 w-48 object-contain"
           />
         </div>

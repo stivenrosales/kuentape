@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, Lora, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { brand } from "@/lib/brand";
 
 const fontSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -20,8 +21,8 @@ const fontMono = Roboto_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "C&A — Contadores y Asociados",
-  description: "Sistema de gestión contable",
+  title: brand.fullName,
+  description: brand.tagline,
 };
 
 export default function RootLayout({
